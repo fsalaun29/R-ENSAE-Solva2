@@ -4,10 +4,40 @@ author: "Marie GANON, Daniel NKAMENI, Florian SALAUN"
 date: ""
 output: pdf_document
 ---
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\B}{\mathcal{B}}
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\tq}{\: | \:}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\diff}{\: d}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\Ber}{\mathrm{Ber}}
+\newcommand{\Poiss}{\mathrm{Poiss}}
+\newcommand{\Exp}{\mathrm{Exp}}
+\newcommand{\Nor}{\mathcal{N}}
+\newcommand{\esp}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\Biais}{\mathrm{Biais}}
+\newcommand{\EQM}{\mathrm{EQM}}
+\newcommand{\Limf}[2]{\underset{#1 \rightarrow #2}{\longrightarrow}}
+\newcommand{\cps}[2]{\underset{#1 \to #2}{\overset{p.s.}{\longrightarrow}}}
+\newcommand{\cloi}[2]{\underset{#1 \to #2}{\overset{(d)}{\longrightarrow}}}
+\newcommand{\SCR}{\mathrm{SCR}}
+\newcommand{\arctanh}{\mathrm{arctanh}}
+---
 
 ```{r setup, include=FALSE}
+# Exécuter cette ligne pour tester le script LaTeX : 
+# knitr::opts_chunk$set(eval = FALSE)
+
 knitr::opts_chunk$set(echo = F)
 library(copula)
+library(matrixStats)
 set.seed(0)
 ```
 
@@ -18,6 +48,12 @@ mu_log = 16.97
 sigma_log = 0.08398
 rho_C = 0.25
 alpha_C = 0.35
+
+n = 10^7
+
+margin_laws_S = c("lnorm", "lnorm")
+margin_params_S = list(list(meanlog=mu_log, sdlog=sigma_log), 
+                       list(meanlog=mu_log, sdlog=sigma_log))
 ```
 
 Puis nous créons deux fonctions afin de calculer le *Best Estimate* (BE) et le *Solvency Capital Requirement* (SCR) d'une variable aléatoire $X$. Ces deux grandeurs sont définies de la manière suivante:
@@ -31,17 +67,122 @@ BE <- function(S){
 SCR <- function(S){
   return(quantile(S, 0.995)[[1]]-BE(S))
 }
+
+SCR_mat <- function(S){
+  return(colQuantiles(S, prob=0.995)-colMeans(S))
+}
+
 ```
 
 ## Modélisation avec copule gaussienne
 ### Formule standard
 
+On définit la copule gaussienne à partir des paramètres introduits plus haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
+
+```{r}
+cop_1 = normalCopula(rho_C, dim=2)
+myMvd_cop_1 = mvdc(copula=cop_1, margins=margin_laws_S,
+                   paramMargins=margin_params_S)
+r_cop1 = rMvdc(n, myMvd_cop_1)
+```
+
+Afin d'obtenir un intervalle de confiance (à 95% disons) de $\SCR(S_1+S_2)$, il nous faut tout d'abord calculer les SCR des deux risques individuels. On peut le faire de manière computationnellement efficace en utilisant les fonctions \texttt{colMeans} (pour le calcul du \textit{Best Estimate}) et \texttt{colQuantiles} (nécessitant l'importation de la librairie \texttt{MatrixStats}).
+
+
+```{r}
+scr1 = SCR_mat(r_cop1)
+scr1
+```
+
+La difficulté consiste dans l'estimation du coefficient de corrélation entre $S_1$ et $S_2$. L'énoncé nous rappelle que :
+$$ \sqrt{n} (\hat{r}_n - r) \cloi{n}{+\infty} \Nor(0,1), \quad \hat{r}_n = \frac{1}{2} \ln \left( \frac{1+\hat{\rho}_n}{1-\hat{\rho}_n} \right) = \arctanh(\hat{\rho}_n), \quad r = \arctanh(\rho). $$
+
+Comme la fonction $x \mapsto \tanh(x)$ est dérivable sur $\R$, d'après le théorème de la méthode Delta :
+
+\begin{align*}
+  \sqrt{n}(\hat{\rho}_n - \rho) &= \sqrt{n} (\tanh(\hat{r}_n) - \tanh(r)) \\
+  &\cloi{n}{+\infty} \Nor(0, (\tanh'(r))^2)
+\end{align*}
+
+avec $\tanh'(r) = 1 - \tanh(r)^2 = 1 - \rho^2$. Ainsi :
+$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2} \cloi{n}{+\infty} Y $$
+avec $Y \sim \Nor(0,1)$. Dans cette formule, deux termes dépendent du coefficient inconnu $\rho$, ce qui ne nous permet pas de déduire directement des intervalles de confiance. Or, on sait que $\hat{\rho}_n \cps{n}{+\infty} \rho$ car
+$$ \widehat{\Cov}(X,Y) \cps{n}{+\infty} \Cov(X,Y), \quad \widehat{\Var}(X) \cps{n}{+\infty} \Var(X), \quad \widehat{\Var}(Y) \cps{n}{+\infty} \Var(Y) $$
+et car la fonction $(x,y,z) \mapsto \frac{x}{\sqrt{y} \sqrt{z}}$ est continue sur $\R \times (\R_+^*)^2$. Par le lemme de Slutsky, on en déduit que :
+$$ \left( \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2}, \hat{\rho}_n \right) \cloi{n}{+\infty} (Y, \rho). $$
+Or, la fonction $(u,v) \mapsto u \frac{1-\rho^2}{1-v^2}$ est continue sur $\R \times ]-1,1[$, d'où :
+$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\hat{\rho}_n^2} \cloi{n}{+\infty} Y. $$
+
+Pour que ce résultat soit rigoureusement valide, il faudrait s'assurer que $\P(\hat{\rho}_n = 1) = 0$. Sinon, il faudrait rajouter un terme $\varepsilon > 0$ arbitrairement petit devant le terme $1-\hat{\rho}_n^2$, ce qui aurait une influence arbitrairement petite sur l'intervalle de confiance obtenu. On décide donc d'omettre cette vérification.
+
+
+Soit $y \in \R$. D'après la convergence en loi, pour $n$ assez grand ($10^7$ convient largement), on a :
+$$ \P\left( \sqrt{n} \frac{|\hat{\rho}_n - \rho|}{1-\hat{\rho}_n^2} \leq y \right) \approx \P(|Y| \leq y) $$
+soit
+$$ \P \left( |\hat{\rho}_n - \rho| \leq y \frac{1-\hat{\rho}_n^2}{\sqrt{n}} \right) \approx \P(|Y| \leq y). $$
+
+Or, $\P(|Y| \leq y) = 2 \P(Y \leq y) - 1$ par symétrie de $Y$. De plus, $2 \P(Y \leq y) - 1 = 0.995$ revient à $\P(Y \leq y) = 0.9975$, et on peut en déduire $y = q_{0.9975}$ à partir de la fonction \texttt{qnorm} de R :
+
+```{r}
+  q = qnorm(0.9975, 0, 1)
+  q
+```
+
+Finalement, avec probabilité 99,5% :
+$$ \rho \in \left[ \hat{\rho}_n - q_{0.9975} \frac{1-\hat{\rho}_n^2}{\sqrt{n}}, \hat{\rho}_n + q_{0.9975} \frac{1-\hat{\rho}_n^2}{\sqrt{n}} \right] $$
+
+et on peut déduire l'application numérique :
+
+```{r}
+  r1 = cor(r_cop1)[1,2]
+  r2 = r1 + c(-q * (1-r1^2)/sqrt(n), q * (1-r1^2)/sqrt(n))
+  r2
+```
+
+ainsi qu'un intervalle de confiance de $\SCR(S_1+S_2)$ à 99.5% via la formule
+$$ \SCR(S_1+S_2) = \sqrt{\SCR(S_1)^2 + \SCR(S_2)^2 + 2 \rho(S_1, S_2) \SCR(S_1) \SCR(S_2)}. $$
+
+```{r}
+  scr1_final = sqrt(sum(scr1^2) + 2*r2*prod(scr1))
+  scr1_final
+```
+
 
 ### Modèle agrégé
 
 ## Modélisation avec copule de Clayton
+
+On définit la copule de Clayton à partir des paramètres introduits plus haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
+
+```{r}
+cop_2 = rotCopula(claytonCopula(alpha_C, dim=2))
+myMvd_cop_2 = mvdc(copula=cop_2, margins=margin_laws_S,
+              paramMargins=margin_params_S)
+r_cop2 = rMvdc(n, myMvd_cop_2)
+```
+
 ### Formule standard
 
+On répète les étapes effectuées avec une modélisation par copule gaussienne. On calcule d'abord les SCR individuels :
+
+```{r}
+scr2 = SCR_mat(r_cop2)
+scr2
+```
+On détermine ensuite un intervalle de confiance à 99.5% du coefficient de corrélation de la même manière que précédemment :
+
+```{r}
+  r1 = cor(r_cop2)[1,2]
+  r2 = r1 + c(-q * (1-r1^2)/sqrt(n), q * (1-r1^2)/sqrt(n))
+  r2
+```
+
+Enfin, on peut en déduire un intervalle de confiance à 99.5% de $\SCR(S_1+S_2)$ :
+
+```{r}
+  scr2_final = sqrt(sum(scr2^2) + 2*r2*prod(scr2))
+  scr2_final
+```
 
 ### Modèle agrégé
 
