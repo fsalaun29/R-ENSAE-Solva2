@@ -6,11 +6,13 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = F)
 library(copula)
+set.seed(0)
 ```
 
 # Partie 1 - Agrégation simple des risques
+Avant toute chose, nous stockons les valeurs des paramètres des lois normales et des copules.
 ```{r}
 mu_log = 16.97
 sigma_log = 0.08398
@@ -18,11 +20,33 @@ rho_C = 0.25
 alpha_C = 0.35
 ```
 
+Puis nous créons deux fonctions afin de calculer le *Best Estimate* (BE) et le *Solvency Capital Requirement* (SCR) d'une variable aléatoire $X$. Ces deux grandeurs sont définies de la manière suivante:
+$$BE(X) = \mathbb{E}(X) \text{ et } SCR(X) = VaR_{99,5\%}(X)-BE(X)$$
+où $VaR_{99,5\%}(X)$ est la *Value at Risk* au niveau 99,5\% correspond au quantile de niveau 99,5\%.
+```{r}
+BE <- function(S){
+  return(mean(S))
+}
+
+SCR <- function(S){
+  return(quantile(S, 0.995)[[1]]-BE(S))
+}
+```
+
 ## Modélisation avec copule gaussienne
+### Formule standard
+
+
+### Modèle agrégé
 
 ## Modélisation avec copule de Clayton
+### Formule standard
+
+
+### Modèle agrégé
 
 # Partie 2 - Agrégation des risques par somme aléatoire
+Nous commençons par définir tous les paramètres qui nous seront utiles par la suite.
 ```{r}
 n1 <- 8477
 p1 <- 0.3679
@@ -31,6 +55,7 @@ p2 <- 0.2191
 k <- 50000
 s <- 67117
 xi <- 0.4270
+n <- 10^5
 
 margin_laws_N = c("nbinom", "nbinom")
 margin_params_N = list(list(size=n1, prob=p1), 
@@ -45,23 +70,80 @@ Mvd_cop_clayton = mvdc(copula=cop_clayton, margins=margin_laws_N,
                    paramMargins=margin_params_N)
 ```
 
-## Modélisation avec copule gaussienne
-### Formule standard
-```{r}
-n <- 10^5
-nb_sinistres <- rMvdc(n,Mvd_cop_norm)
-nb_S1 <- nb_sinistres[,1]
-nb_S2 <- nb_sinistres[,2]
+Pour simuler $S_1$ et $S_2$ nous procédons en plusieurs étapes. Nous simulons dans un premier temps les deux nombres de sinistres, avec des lois marginales négatives binomiales et la structure de copule choisie (gaussienne ou Clayton). Puis, pour chaque simulation:
 
-S1 <- sapply(1:n, function(i){sum(rlnorm(nb_S1[i], meanlog = mu_log, sdlog = sigma_log))})
+1. Nous générons les X_n^1 selon la loi $\mathcal{LN}(\mu_{log}, \sigma_{log})$.
+2. Nous générons les $U_n$ selon la loi $\mathcal{U}([0,1])$. 
+3. Nous calculons $X_n^2 = k + \frac{s}{\xi}(U^{-\xi}-1)$.
+4. Enfin nous sommons respectivement les $X_n^1$ et les $X_n^2$ pour obtenir $S_1$ et $S_2$.
+
+```{r}
+simu_somme_aleatoire <- function(mvd){
+  nb_sinistres <- rMvdc(n,mvd)
+  nb_S1 <- nb_sinistres[,1]
+  nb_S2 <- nb_sinistres[,2]
+  
+  S1 <- sapply(1:n, function(i){
+    sum(rlnorm(nb_S1[i], meanlog = mu_log, sdlog = sigma_log))
+  })
+  
+  S2 <- sapply(1:n, function(i){
+    U <- runif(nb_S2[i])
+    sum(k+s/xi*(U^(-xi)-1))
+  })
+  
+  return(data.frame("S1" = S1, "S2" = S2))
+}
+```
+
+## Modélisation avec copule gaussienne
+Dans cette partie, nous appliquons une structure de copule gaussienne de paramètre $\rho_C$.
+```{r}
+df_norm <- simu_somme_aleatoire(Mvd_cop_norm)
+```
+
+### Formule standard
+Pour appliquer la formule standard, nous avons tout d'abord besoin de calculer le coefficient de corrélation linéaire $\rho$ entre $S_1$ et $S_2$. Celui-ci se calcule empiriquement de la manière suivante:
+$$\hat{\rho}_n = \frac{\sum_{i = 1}^n(S_1^i- \overline{S_1})(S_2^i- \overline{S_2})}{\sqrt{\sum_{i = 1}^n(S_1^i- \overline{S_1})^2}\sqrt{\sum_{i = 1}^n(S_2^i- \overline{S_2})^2}}$$
+
+La formule standard donne le SCR suivant:
+```{r}
+SCR_FS <- function(S1, S2){
+  rho <- cor(S1,S2)
+  SCR_1 <- SCR(S1)
+  SCR_2 <- SCR(S2)
+  return(sqrt(SCR_1^2+SCR_2^2+2*rho*SCR_1*SCR_2))
+}
+
+SCR_FS(df_norm$S1, df_norm$S2)
 ```
 
 ### Modèle agrégé
+En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous obtenons:
+```{r}
+S_norm <- df_norm$S1+df_norm$S2
+SCR(S_norm)
+```
+
+### Comparaison 
 
 ## Modélisation avec copule de Clayton
-### Formule standard
+Dans cette partie, nous appliquons une structure de copule de Clayton inversée de paramètre $\alpha_C$.
 ```{r}
+df_clayton <- simu_somme_aleatoire(Mvd_cop_clayton)
+```
 
+### Formule standard
+La formule standard donne le SCR suivant:
+```{r}
+SCR_FS(df_clayton$S1, df_clayton$S2)
 ```
 
 ### Modèle agrégé
+En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous obtenons:
+```{r}
+S_clayton <- df_clayton$S1+df_clayton$S2
+SCR(S_clayton)
+```
+
+### Comparaison
