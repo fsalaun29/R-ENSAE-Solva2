@@ -1,0 +1,67 @@
+---
+title: "Projet de Langage R en Actuariat"
+author: "Marie GANON, Daniel NKAMENI, Florian SALAUN"
+date: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(copula)
+```
+
+# Partie 1 - Agrégation simple des risques
+```{r}
+mu_log = 16.97
+sigma_log = 0.08398
+rho_C = 0.25
+alpha_C = 0.35
+```
+
+## Modélisation avec copule gaussienne
+
+## Modélisation avec copule de Clayton
+
+# Partie 2 - Agrégation des risques par somme aléatoire
+```{r}
+n1 <- 8477
+p1 <- 0.3679
+n2 <- 8
+p2 <- 0.2191
+k <- 50000
+s <- 67117
+xi <- 0.4270
+
+margin_laws_N = c("nbinom", "nbinom")
+margin_params_N = list(list(size=n1, prob=p1), 
+                       list(size=n2, prob=p2))
+
+cop_norm = normalCopula(rho_C, dim=2)
+Mvd_cop_norm = mvdc(copula=cop_norm, margins=margin_laws_N,
+                   paramMargins=margin_params_N)
+
+cop_clayton <- rotCopula(claytonCopula(alpha_C, dim=2))
+Mvd_cop_clayton = mvdc(copula=cop_clayton, margins=margin_laws_N,
+                   paramMargins=margin_params_N)
+```
+
+## Modélisation avec copule gaussienne
+### Formule standard
+```{r}
+n <- 10^5
+nb_sinistres <- rMvdc(n,Mvd_cop_norm)
+nb_S1 <- nb_sinistres[,1]
+nb_S2 <- nb_sinistres[,2]
+
+S1 <- sapply(1:n, function(i){sum(rlnorm(nb_S1[i], meanlog = mu_log, sdlog = sigma_log))})
+```
+
+### Modèle agrégé
+
+## Modélisation avec copule de Clayton
+### Formule standard
+```{r}
+
+```
+
+### Modèle agrégé
