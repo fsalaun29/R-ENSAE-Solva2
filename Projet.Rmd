@@ -86,7 +86,7 @@ myMvd_cop_1 = mvdc(copula=cop_1, margins=margin_laws_S,
 r_cop1 = rMvdc(n, myMvd_cop_1)
 ```
 
-Afin d'obtenir un intervalle de confiance (à 95% disons) de $\SCR(S_1+S_2)$, il nous faut tout d'abord calculer les SCR des deux risques individuels. On peut le faire de manière computationnellement efficace en utilisant les fonctions \texttt{colMeans} (pour le calcul du \textit{Best Estimate}) et \texttt{colQuantiles} (nécessitant l'importation de la librairie \texttt{MatrixStats}).
+Afin d'obtenir un intervalle de confiance de $\SCR(S_1+S_2)$, il nous faut tout d'abord calculer les SCR des deux risques individuels. On peut le faire de manière computationnellement efficace en utilisant les fonctions \texttt{colMeans} (pour le calcul du \textit{Best Estimate}) et \texttt{colQuantiles} (nécessitant l'importation de la librairie \texttt{MatrixStats}).
 
 
 ```{r}
