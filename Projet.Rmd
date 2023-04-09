@@ -148,8 +148,79 @@ $$ \SCR(S_1+S_2) = \sqrt{\SCR(S_1)^2 + \SCR(S_2)^2 + 2 \rho(S_1, S_2) \SCR(S_1) 
 ```
 
 
-### Modèle agrégé
+### Approche exacte
 
+Dans cette partie, nous calculons le $\SCR$ de $S = S_1+S_2$ en utilisant une approche directe. Il sera question de simuler $S_1$ et $S_2$, de caluler $S$ et ensuite d'appliquer la formule:
+$$\SCR(S)=VaR_{99,5\%}(S)-BE(S) \text{ où }BE(S) = \mathbb{E}(S) $$
+Le *Best Estimate* (moyenne) de $S \text{, }BE(S)$ est égal à: 
+```{r}
+S_1 = apply(r_cop1,1,sum)
+BE_S_1 = mean(S_1)
+BE_S_1
+```
+La $VaR_{99,5\%}(S)$ est obtenue en calculant le quantile d'ordre 99,5% de $S$. Elle est égale à:
+```{r}
+VaR_S_1 = as.numeric(quantile(S_1, probs = 0.995))
+VaR_S_1
+```
+Le $\SCR(S)$ est donc égal à :
+```{r}
+SCR_S_1 = VaR_S_1 - BE_S_1
+SCR_S_1
+```
+Calculons à présent l'intervalle de confiance à $99,5\%$ de ce SCR. Nous savons que :
+$$\sqrt{n} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} \Nor\left(0,\frac{\alpha(1-\alpha)}{f_S(q_\alpha)}\right)$$
+Où $f_S(q_\alpha)$ est la densité de $S$ au point $q_\alpha$. On peut réécrire cette convergence en loi sous la forme:
+$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} Y \text{ où } Y\sim\Nor(0,1)$$
+Comme à la question précédente, deux termes dépendent du coefficient inconnu $q_\alpha$. Pour déterminer l'intervalle de confiance, on fera l'hypothèse que $\hat{q}_n \cps{n}{+\infty} q_\alpha$. Puisque la fonction $f_S$ est continue sur $\R$, on a $f_S(\hat{q}_n) \cps{n}{+\infty} f_S(q_\alpha)$ et par le Lemme de Slutsky, on en déduit que:
+
+$$\left(\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha),f_S(\hat{q}_n^\alpha) \right)  \cloi{n}{+\infty} (Y,f_S(q_\alpha))$$
+Or, la fonction $(u,v) \mapsto u \frac{\sqrt{v}}{\sqrt{f_S(q_\alpha)}}$ est continue sur $\R \times \R$, d'où :
+$$\sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} Y$$
+Pour la suite, il nous faut $f_S(\hat{q}_\alpha)$. Nous allons estimer la densité de $S$, $f_S$ par la méthode des noyaux. Il s'agit d'une méthode non paramétrique permettant d'estimer la densité de probabilité d’une variable aléatoire continue. Cette estimation est donnée par:
+$$\hat{f}(x)=\frac{1}{nh}\sum_{i=1}^{n}K\left[\frac{x-x_i}{h}\right]$$
+Où $h$ est le pas, $n$ la taille de l'échantillon et $K$ est le noyau choisi. Ce noyau est en général gaussien, uniforme ou triangulaire. La fonction \texttt{density} de R permet de faire cette estimation sans difficulté. L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
+```{r fig.align="center"}
+density_S_1 = density(S_1, n = 1024)
+plot(density_S_1, main ="Densité de S (construit avec une copule Gaussienne)" ,xlab = "S", ylab = "Densité")
+```
+
+L'estimation de cette densité au point $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est obtenue par interpolation grâce à la fonction \texttt{approx} de R et est égale à :
+```{r}
+f_density_S_1 = approx(density_S_1$x, density_S_1$y, xout = VaR_S_1)$y
+f_density_S_1
+```
+Soit $y \in \R$. Pour $n$ assez grand, on a :
+$$ \P\left( \sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} |(\hat{q}_n^\alpha - q_\alpha)| \leq y \right) \approx \P(|Y| \leq y) $$
+soit
+$$ \P \left( |(\hat{q}_n^\alpha - q_\alpha)| \leq y \sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}} \right) \approx \P(|Y| \leq y). $$
+
+Or, $\P(|Y| \leq y) = 2 \P(Y \leq y) - 1$ par symétrie de $Y$. De plus, $2 \P(Y \leq y) - 1 = 0,995$ revient à $\P(Y \leq y) = 0.9975$, et on peut en déduire $y = q_{0,9975}^{norm}$ à partir de la fonction \texttt{qnorm} de R :
+
+```{r}
+  q = qnorm(0.9975, 0, 1)
+  q
+```
+
+Finalement, avec probabilité 99,5% :
+$$ q_{0,995} = VaR_{99,5\%} \in \left[ \hat{VaR}_{99,5\%} - q_{0,9975}^{norm}\sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}}, \hat{VaR}_{99,5\%} + q_{0,9975}^{norm}\sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}} \right] $$
+Où $q_{0.9975}^{norm}$ est le quantile d'ordre $0,9975$ de la loi normale centrée reduite. On peut déduire l'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ :
+
+```{r}
+A = sqrt((0.995*(1-0.995))/f_density_S_1)
+CI_1 = VaR_S_1 - qnorm(0.95)*(A/sqrt(n))
+CI_2 = VaR_S_1 + qnorm(0.95)*(A/sqrt(n))  
+CI = c(CI_1,CI_2)
+CI
+```
+
+ainsi qu'un intervalle de confiance de $\SCR(S_1+S_2)$ à 99.5% via la formule
+$$ \SCR(S)=VaR_{99,5\%}(S)-BE(S) $$
+
+```{r}
+CI = CI - BE_S_1
+CI
+```
 ## Modélisation avec copule de Clayton
 
 On définit la copule de Clayton à partir des paramètres introduits plus haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
@@ -184,8 +255,50 @@ Enfin, on peut en déduire un intervalle de confiance à 99.5% de $\SCR(S_1+S_2)
   scr2_final
 ```
 
-### Modèle agrégé
+### Approche exacte
+La démarche à suivre dans cette partie est identique à celle utilisée avec la copule gaussienne. En simulant $S_1$ et $S_2$ grâce à la copule de Clayton, le *Best Estimate* de $S \text{, }BE(S)$ est égal à:
 
+```{r}
+S_2 = apply(r_cop2,1,sum)
+BE_S_2 = mean(S_2)
+BE_S_2
+```
+
+La $VaR_{99,5\%}(S)$ est égale à:
+```{r}
+VaR_S_2 = as.numeric(quantile(S_2, probs = 0.995))
+VaR_S_2
+```
+Le $\SCR(S)$ est donc égal à :
+```{r}
+SCR_S_2 = VaR_S_2 - BE_S_2
+SCR_S_2
+```
+L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
+```{r fig.align="center"}
+density_S_2 = density(S_2, n = 1024)
+plot(density_S_2, main ="Densité de S (construit avec une copule de Clayton)" ,xlab = "S", ylab = "Densité")
+```
+L'estimation de cette densité au point $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
+```{r}
+f_density_S_2 = approx(density_S_2$x, density_S_2$y, xout = VaR_S_2)$y
+f_density_S_2
+```
+L'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ est :
+```{r}
+A = sqrt((0.995*(1-0.995))/f_density_S_2)
+CI_1 = VaR_S_2 - qnorm(0.95)*(A/sqrt(n))
+CI_2 = VaR_S_2 + qnorm(0.95)*(A/sqrt(n))  
+CI = c(CI_1,CI_2)
+CI
+```
+
+Et l'intervalle de confiance à $99,5\%$ du $\SCR(S_1+S_2)$ est :
+
+```{r}
+CI = CI - BE_S_2
+CI
+```
 # Partie 2 - Agrégation des risques par somme aléatoire
 Nous commençons par définir tous les paramètres qui nous seront utiles par la suite.
 ```{r}
