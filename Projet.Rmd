@@ -4,7 +4,7 @@ author: "Marie GANON, Daniel NKAMENI, Florian SALAUN"
 output: 
   pdf_document:
     fig_width: 4
-    fig_height: 5
+    fig_height: 4
     number_sections: true
 ---
 \newcommand{\Var}{\mathrm{Var}}
@@ -38,7 +38,7 @@ output:
 # Exécuter cette ligne pour tester le script LaTeX : 
 # knitr::opts_chunk$set(eval = FALSE)
 
-knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(echo = F, fig.pos= "h")
 library(copula)
 library(matrixStats)
 library(spatstat)
@@ -191,7 +191,7 @@ $$\sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\al
 Pour la suite, il nous faut $f_S(\hat{q}_\alpha)$. Nous allons estimer la densité de $S$, $f_S$ par la méthode des noyaux. Il s'agit d'une méthode non paramétrique permettant d'estimer la densité de probabilité d’une variable aléatoire continue. Cette estimation est donnée par:
 $$\hat{f}(x)=\frac{1}{nh}\sum_{i=1}^{n}K\left[\frac{x-x_i}{h}\right]$$
 Où $h$ est le pas, $n$ la taille de l'échantillon et $K$ est le noyau choisi. Ce noyau est en général gaussien, uniforme ou triangulaire. La fonction \texttt{density} de R permet de faire cette estimation sans difficulté. L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
-```{r fig.align="center", fig.cap =  "Densité de S - Copule gaussienne", fig.pos="!H"}
+```{r fig.align="center", fig.cap =  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
 plot(density_S_norm, xlab = "S", ylab = "Densité", main = "")
 ```
@@ -290,7 +290,7 @@ SCR_clayton <- SCR(S_clayton)
 SCR_clayton
 ```
 L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
-```{r fig.align="center", fig.cap = "Densité de S - Copule de Clayton", fig.pos="!H"}
+```{r fig.align="center", fig.cap = "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
 plot(density_S_clayton,xlab = "S", ylab = "Densité", main = "")
 ```
@@ -316,7 +316,7 @@ IC_clayton
 ```
 ## Comparaison des méthodes 
 Afin de comparer les deux méthodes, nous présentons dans la table suivante l'ensemble de nos résultats.
-```{r, results="asis", fig.pos="!H"}
+```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle exact" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
@@ -402,7 +402,7 @@ Nous cherchons également à déterminer un intervalle de confiance pour le SCR.
 *Ajout calculs*
 
 Nous devons donc approximer la densité de $S$. Par la méthode des noyaux, nous obtenons la fonction suivante.
-```{r fig.align="center", fig.cap=  "Densité de S - Copule gaussienne", fig.pos="!H"}
+```{r fig.align="center", fig.cap=  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
 plot(density_S_norm, xlab = "S", ylab = "Densité", main = "") 
 ```
@@ -451,7 +451,7 @@ SCR_clayton
 ```
 
 Nous cherchons également à déterminer un intervalle de confiance pour le SCR. Comme précédemment, nous approximons la densité de $S$ par la méthode des noyaux.
-```{r fig.align="center", fig.cap=  "Densité de S - Copule de Clayton", fig.pos="!H"}
+```{r fig.align="center", fig.cap=  "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
 plot(density_S_clayton, xlab = "S", ylab = "Densité", main = "")
 ```
@@ -478,7 +478,7 @@ IC_clayton <- CI-BE(S_clayton)
 
 ## Comparaison des méthodes 
 Afin de comparer les deux méthodes, nous présentons dans la table suivante l'ensemble de nos résultats.
-```{r, results="asis", fig.pos="!H"}
+```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle exact" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
