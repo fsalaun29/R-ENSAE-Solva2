@@ -312,6 +312,7 @@ Et l'intervalle de confiance à $99,5\%$ du $\SCR(S_1+S_2)$ est :
 
 ```{r}
 IC_clayton <- CI - mean(S_clayton)
+IC_clayton
 ```
 ## Comparaison des méthodes 
 Afin de comparer les deux méthodes, nous présentons dans la table suivante l'ensemble de nos résultats.
@@ -424,6 +425,7 @@ Une fois l'intervalle de confiance calculé pour le quantile d'ordre 99,5\% de $
 
 ```{r}
 IC_norm <- CI-BE(S_norm)
+IC_norm
 ```
 
 ## Modélisation avec copule de Clayton
@@ -436,7 +438,7 @@ S_i_clayton <- simu_somme_aleatoire(Mvd_cop_clayton)
 ### Formule standard
 La formule standard donne le SCR suivant:
 ```{r}
-SCR_FS_clayton <- SCR_FS(S_i_clayton, cor(S_i_clayton)[1,2])
+SCR_FS_clayton <- SCR_FS(SCR_i_clayton, cor(S_i_clayton)[1,2])
 SCR_FS_clayton
 ```
 
