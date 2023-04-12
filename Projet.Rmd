@@ -6,7 +6,12 @@ output:
     fig_width: 4
     fig_height: 4
     number_sections: true
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
+
+```{=tex}
 \newcommand{\Var}{\mathrm{Var}}
 \newcommand{\Cov}{\mathrm{Cov}}
 \newcommand{\R}{\mathbb{R}}
@@ -32,25 +37,32 @@ output:
 \newcommand{\cloi}[2]{\underset{#1 \to #2}{\overset{(d)}{\longrightarrow}}}
 \newcommand{\SCR}{\mathrm{SCR}}
 \newcommand{\arctanh}{\mathrm{arctanh}}
----
+```
+
+------------------------------------------------------------------------
 
 ```{r setup, include=FALSE}
 # Exécuter cette ligne pour tester le script LaTeX : 
 # knitr::opts_chunk$set(eval = FALSE)
 
 knitr::opts_chunk$set(echo = F, fig.pos= "h")
+library(knitr)
 library(copula)
 library(matrixStats)
 library(spatstat)
 library(papeR)
 library(cowplot)
+library(ggplot2)
 library(microbenchmark)
 options(xtable.comment = FALSE)
 set.seed(0)
 ```
 
 # Partie 1 - Agrégation simple des risques
-Avant toute chose, nous stockons les valeurs des paramètres des lois normales et des copules.
+
+Avant toute chose, nous stockons les valeurs des paramètres des lois
+normales et des copules.
+
 ```{r}
 mu_log = 16.97
 sigma_log = 0.08398
@@ -64,9 +76,13 @@ margin_params_S = list(list(meanlog=mu_log, sdlog=sigma_log),
                        list(meanlog=mu_log, sdlog=sigma_log))
 ```
 
-Puis nous créons deux fonctions afin de calculer le *Best Estimate* (BE) et le *Solvency Capital Requirement* (SCR) d'une variable aléatoire $X$. Ces deux grandeurs sont définies de la manière suivante:
-$$BE(X) = \mathbb{E}(X) \text{ et } SCR(X) = VaR_{99,5\%}(X)-BE(X)$$
-où $VaR_{99,5\%}(X)$ est la *Value at Risk* au niveau 99,5\% correspond au quantile de niveau 99,5\%.
+Puis nous créons deux fonctions afin de calculer le *Best Estimate* (BE)
+et le *Solvency Capital Requirement* (SCR) d'une variable aléatoire $X$.
+Ces deux grandeurs sont définies de la manière suivante:
+$$BE(X) = \mathbb{E}(X) \text{ et } SCR(X) = VaR_{99,5\%}(X)-BE(X)$$ où
+$VaR_{99,5\%}(X)$ est la *Value at Risk* au niveau 99,5% correspond au
+quantile de niveau 99,5%.
+
 ```{r}
 BE <- function(S){
   return(mean(S))
@@ -82,9 +98,11 @@ SCR_mat <- function(S){
 ```
 
 ## Modélisation avec copule gaussienne
+
 ### Formule standard
 
-On définit la copule gaussienne à partir des paramètres introduits plus haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
+On définit la copule gaussienne à partir des paramètres introduits plus
+haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
 
 ```{r}
 cop_norm = normalCopula(rho_C, dim=2)
@@ -93,42 +111,64 @@ myMvd_cop_norm = mvdc(copula=cop_norm, margins=margin_laws_S,
 S_i_norm = rMvdc(n, myMvd_cop_norm)
 ```
 
-Afin d'obtenir un intervalle de confiance de $\SCR(S_1+S_2)$, il nous faut tout d'abord calculer les SCR des deux risques individuels. On peut le faire de manière computationnellement efficace en utilisant les fonctions \texttt{colMeans} (pour le calcul du \textit{Best Estimate}) et \texttt{colQuantiles} (nécessitant l'importation de la librairie \texttt{MatrixStats}).
-
+Afin d'obtenir un intervalle de confiance de $\mathrm{SCR}(S_1+S_2)$, il
+nous faut tout d'abord calculer les SCR des deux risques individuels. On
+peut le faire de manière computationnellement efficace en utilisant les
+fonctions \texttt{colMeans} (pour le calcul du \textit{Best Estimate})
+et \texttt{colQuantiles} (nécessitant l'importation de la librairie
+\texttt{MatrixStats}).
 
 ```{r}
 SCR_i_norm = SCR_mat(S_i_norm)
 SCR_i_norm
 ```
 
-La difficulté consiste dans l'estimation du coefficient de corrélation entre $S_1$ et $S_2$. L'énoncé nous rappelle que :
-$$ \sqrt{n} (\hat{r}_n - r) \cloi{n}{+\infty} \Nor(0,1), \quad \hat{r}_n = \frac{1}{2} \ln \left( \frac{1+\hat{\rho}_n}{1-\hat{\rho}_n} \right) = \arctanh(\hat{\rho}_n), \quad r = \arctanh(\rho). $$
+La difficulté consiste dans l'estimation du coefficient de corrélation
+entre $S_1$ et $S_2$. L'énoncé nous rappelle que :
+$$ \sqrt{n} (\hat{r}_n - r) \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}(0,1), \quad \hat{r}_n = \frac{1}{2} \ln \left( \frac{1+\hat{\rho}_n}{1-\hat{\rho}_n} \right) = \mathrm{arctanh}(\hat{\rho}_n), \quad r = \mathrm{arctanh}(\rho). $$
 
-Comme la fonction $x \mapsto \tanh(x)$ est dérivable sur $\R$, d'après le théorème de la méthode Delta :
+Comme la fonction $x \mapsto \tanh(x)$ est dérivable sur $\mathbb{R}$,
+d'après le théorème de la méthode Delta :
 
+```{=tex}
 \begin{align*}
   \sqrt{n}(\hat{\rho}_n - \rho) &= \sqrt{n} (\tanh(\hat{r}_n) - \tanh(r)) \\
-  &\cloi{n}{+\infty} \Nor(0, (\tanh'(r))^2)
+  &\underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}(0, (\tanh'(r))^2)
 \end{align*}
-
+```
 avec $\tanh'(r) = 1 - \tanh(r)^2 = 1 - \rho^2$. Ainsi :
-$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2} \cloi{n}{+\infty} Y $$
-avec $Y \sim \Nor(0,1)$. Dans cette formule, deux termes dépendent du coefficient inconnu $\rho$, ce qui ne nous permet pas de déduire directement des intervalles de confiance. Or, on sait que $\hat{\rho}_n \cps{n}{+\infty} \rho$ car
-$$ \widehat{\Cov}(X,Y) \cps{n}{+\infty} \Cov(X,Y), \quad \widehat{\Var}(X) \cps{n}{+\infty} \Var(X), \quad \widehat{\Var}(Y) \cps{n}{+\infty} \Var(Y) $$
-et car la fonction $(x,y,z) \mapsto \frac{x}{\sqrt{y} \sqrt{z}}$ est continue sur $\R \times (\R_+^*)^2$. Par le lemme de Slutsky, on en déduit que :
-$$ \left( \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2}, \hat{\rho}_n \right) \cloi{n}{+\infty} (Y, \rho). $$
-Or, la fonction $(u,v) \mapsto u \frac{1-\rho^2}{1-v^2}$ est continue sur $\R \times ]-1,1[$, d'où :
-$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\hat{\rho}_n^2} \cloi{n}{+\infty} Y. $$
+$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2} \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y $$
+avec $Y \sim \mathcal{N}(0,1)$. Dans cette formule, deux termes
+dépendent du coefficient inconnu $\rho$, ce qui ne nous permet pas de
+déduire directement des intervalles de confiance. Or, on sait que
+$\hat{\rho}_n \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \rho$
+car
+$$ \widehat{\mathrm{Cov}}(X,Y) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Cov}(X,Y), \quad \widehat{\mathrm{Var}}(X) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Var}(X), \quad \widehat{\mathrm{Var}}(Y) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Var}(Y) $$
+et car la fonction $(x,y,z) \mapsto \frac{x}{\sqrt{y} \sqrt{z}}$ est
+continue sur $\mathbb{R}\times (\mathbb{R}_+^*)^2$. Par le lemme de
+Slutsky, on en déduit que :
+$$ \left( \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2}, \hat{\rho}_n \right) \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} (Y, \rho). $$
+Or, la fonction $(u,v) \mapsto u \frac{1-\rho^2}{1-v^2}$ est continue
+sur $\mathbb{R}\times ]-1,1[$, d'où :
+$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\hat{\rho}_n^2} \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y. $$
 
-Pour que ce résultat soit rigoureusement valide, il faudrait s'assurer que $\P(\hat{\rho}_n = 1) = 0$. Sinon, il faudrait rajouter un terme $\varepsilon > 0$ arbitrairement petit devant le terme $1-\hat{\rho}_n^2$, ce qui aurait une influence arbitrairement petite sur l'intervalle de confiance obtenu. On décide donc d'omettre cette vérification.
+Pour que ce résultat soit rigoureusement valide, il faudrait s'assurer
+que $\mathbb{P}(\hat{\rho}_n = 1) = 0$. Sinon, il faudrait rajouter un
+terme $\varepsilon > 0$ arbitrairement petit devant le terme
+$1-\hat{\rho}_n^2$, ce qui aurait une influence arbitrairement petite
+sur l'intervalle de confiance obtenu. On décide donc d'omettre cette
+vérification.
 
-
-Soit $y \in \R$. D'après la convergence en loi, pour $n$ assez grand ($10^7$ convient largement), on a :
-$$ \P\left( \sqrt{n} \frac{|\hat{\rho}_n - \rho|}{1-\hat{\rho}_n^2} \leq y \right) \approx \P(|Y| \leq y) $$
+Soit $y \in \mathbb{R}$. D'après la convergence en loi, pour $n$ assez
+grand ($10^7$ convient largement), on a :
+$$ \mathbb{P}\left( \sqrt{n} \frac{|\hat{\rho}_n - \rho|}{1-\hat{\rho}_n^2} \leq y \right) \approx \mathbb{P}(|Y| \leq y) $$
 soit
-$$ \P \left( |\hat{\rho}_n - \rho| \leq y \frac{1-\hat{\rho}_n^2}{\sqrt{n}} \right) \approx \P(|Y| \leq y). $$
+$$ \mathbb{P}\left( |\hat{\rho}_n - \rho| \leq y \frac{1-\hat{\rho}_n^2}{\sqrt{n}} \right) \approx \mathbb{P}(|Y| \leq y). $$
 
-Or, $\P(|Y| \leq y) = 2 \P(Y \leq y) - 1$ par symétrie de $Y$. De plus, $2 \P(Y \leq y) - 1 = 0.995$ revient à $\P(Y \leq y) = 0.9975$, et on peut en déduire $y = q_{0.9975}$ à partir de la fonction \texttt{qnorm} de R :
+Or, $\mathbb{P}(|Y| \leq y) = 2 \mathbb{P}(Y \leq y) - 1$ par symétrie
+de $Y$. De plus, $2 \mathbb{P}(Y \leq y) - 1 = 0.995$ revient à
+$\mathbb{P}(Y \leq y) = 0.9975$, et on peut en déduire $y = q_{0.9975}$
+à partir de la fonction \texttt{qnorm} de R :
 
 ```{r}
 q <- qnorm(0.9975, 0, 1)
@@ -146,8 +186,9 @@ r2 = r1 + c(-q * (1-r1^2)/sqrt(n), q * (1-r1^2)/sqrt(n))
 r2
 ```
 
-ainsi qu'un intervalle de confiance de $\SCR(S_1+S_2)$ à 99.5% via la formule
-$$ \SCR(S_1+S_2) = \sqrt{\SCR(S_1)^2 + \SCR(S_2)^2 + 2 \rho(S_1, S_2) \SCR(S_1) \SCR(S_2)}. $$
+ainsi qu'un intervalle de confiance de $\mathrm{SCR}(S_1+S_2)$ à 99.5%
+via la formule
+$$ \mathrm{SCR}(S_1+S_2) = \sqrt{\mathrm{SCR}(S_1)^2 + \mathrm{SCR}(S_2)^2 + 2 \rho(S_1, S_2) \mathrm{SCR}(S_1) \mathrm{SCR}(S_2)}. $$
 
 ```{r}
 SCR_FS <- function(SCR_i, rho){
@@ -161,53 +202,86 @@ IC_FS_norm <- SCR_FS(SCR_i_norm, r2)
 print(c("Intervalle de confiance", IC_FS_norm))
 ```
 
-
 ### Approche exacte
-Dans cette partie, nous calculons le $\SCR$ de $S = S_1+S_2$ en utilisant une approche directe. Il sera question de simuler $S_1$ et $S_2$, de caluler $S$ et ensuite d'appliquer la formule:
-$$\SCR(S)=VaR_{99,5\%}(S)-BE(S) \text{ où }BE(S) = \mathbb{E}(S) $$
-Le *Best Estimate* (moyenne) de $S \text{, }BE(S)$ est égal à: 
+
+Dans cette partie, nous calculons le $\mathrm{SCR}$ de $S = S_1+S_2$ en
+utilisant une approche directe. Il sera question de simuler $S_1$ et
+$S_2$, de caluler $S$ et ensuite d'appliquer la formule:
+$$\mathrm{SCR}(S)=VaR_{99,5\%}(S)-BE(S) \text{ où }BE(S) = \mathbb{E}(S) $$
+Le *Best Estimate* (moyenne) de $S \text{, }BE(S)$ est égal à:
+
 ```{r}
 S_norm = S_i_norm[,1]+S_i_norm[,2]
 BE(S_norm)
 ```
-La $VaR_{99,5\%}(S)$ est obtenue en calculant le quantile d'ordre 99,5% de $S$. Elle est égale à:
+
+La $VaR_{99,5\%}(S)$ est obtenue en calculant le quantile d'ordre 99,5%
+de $S$. Elle est égale à:
+
 ```{r}
 VaR_S_norm = quantile(S_norm, probs = 0.995)[[1]]
 VaR_S_norm
 ```
-Le $\SCR(S)$ est donc égal à :
+
+Le $\mathrm{SCR}(S)$ est donc égal à :
+
 ```{r}
 SCR_norm = VaR_S_norm - BE(S_norm)
 SCR_norm
 ```
-Calculons à présent l'intervalle de confiance à $99,5\%$ de ce SCR. Nous savons que :
-$$\sqrt{n} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} \Nor\left(0,\frac{\alpha(1-\alpha)}{f_S(q_\alpha)}\right)$$
-Où $f_S(q_\alpha)$ est la densité de $S$ au point $q_\alpha$. On peut réécrire cette convergence en loi sous la forme:
-$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} Y \text{ où } Y\sim\Nor(0,1)$$
-Comme à la question précédente, deux termes dépendent du coefficient inconnu $q_\alpha$. Pour déterminer l'intervalle de confiance, on fera l'hypothèse que $\hat{q}_n \cps{n}{+\infty} q_\alpha$. Puisque la fonction $f_S$ est continue sur $\R$, on a $f_S(\hat{q}_n) \cps{n}{+\infty} f_S(q_\alpha)$ et par le Lemme de Slutsky, on en déduit que:
 
-$$\left(\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha),f_S(\hat{q}_n^\alpha) \right)  \cloi{n}{+\infty} (Y,f_S(q_\alpha))$$
-Or, la fonction $(u,v) \mapsto u \frac{\sqrt{v}}{\sqrt{f_S(q_\alpha)}}$ est continue sur $\R \times \R$, d'où :
-$$\sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \cloi{n}{+\infty} Y$$
-Pour la suite, il nous faut $f_S(\hat{q}_\alpha)$. Nous allons estimer la densité de $S$, $f_S$ par la méthode des noyaux. Il s'agit d'une méthode non paramétrique permettant d'estimer la densité de probabilité d’une variable aléatoire continue. Cette estimation est donnée par:
+Calculons à présent l'intervalle de confiance à $99,5\%$ de ce SCR. Nous
+savons que :
+$$\sqrt{n} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}\left(0,\frac{\alpha(1-\alpha)}{f_S(q_\alpha)}\right)$$
+Où $f_S(q_\alpha)$ est la densité de $S$ au point $q_\alpha$. On peut
+réécrire cette convergence en loi sous la forme:
+$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
+Comme à la question précédente, deux termes dépendent du coefficient
+inconnu $q_\alpha$. Pour déterminer l'intervalle de confiance, on fera
+l'hypothèse que
+$\hat{q}_n \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} q_\alpha$.
+Puisque la fonction $f_S$ est continue sur $\mathbb{R}$, on a
+$f_S(\hat{q}_n) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} f_S(q_\alpha)$
+et par le Lemme de Slutsky, on en déduit que:
+
+$$\left(\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha),f_S(\hat{q}_n^\alpha) \right)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} (Y,f_S(q_\alpha))$$
+Or, la fonction $(u,v) \mapsto u \frac{\sqrt{v}}{\sqrt{f_S(q_\alpha)}}$
+est continue sur $\mathbb{R}\times \mathbb{R}$, d'où :
+$$\sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y$$
+Pour la suite, il nous faut $f_S(\hat{q}_\alpha)$. Nous allons estimer
+la densité de $S$, $f_S$ par la méthode des noyaux. Il s'agit d'une
+méthode non paramétrique permettant d'estimer la densité de probabilité
+d'une variable aléatoire continue. Cette estimation est donnée par:
 $$\hat{f}(x)=\frac{1}{nh}\sum_{i=1}^{n}K\left[\frac{x-x_i}{h}\right]$$
-Où $h$ est le pas, $n$ la taille de l'échantillon et $K$ est le noyau choisi. Ce noyau est en général gaussien, uniforme ou triangulaire. La fonction \texttt{density} de R permet de faire cette estimation sans difficulté. L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
+Où $h$ est le pas, $n$ la taille de l'échantillon et $K$ est le noyau
+choisi. Ce noyau est en général gaussien, uniforme ou triangulaire. La
+fonction \texttt{density} de R permet de faire cette estimation sans
+difficulté. L'estimation de la densité de $S$ est représentée dans le
+graphique ci-dessous:
+
 ```{r fig.align="center", fig.cap =  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
 plot(density_S_norm, xlab = "S", ylab = "Densité", main = "")
 ```
 
-L'estimation de cette densité au point $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est obtenue par interpolation grâce à la fonction \texttt{approx} de R et est égale à :
+L'estimation de cette densité au point
+$\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est obtenue par interpolation
+grâce à la fonction \texttt{approx} de R et est égale à :
+
 ```{r}
 f_density_S_norm = approx(density_S_norm$x, density_S_norm$y, xout = VaR_S_norm)$y
 f_density_S_norm
 ```
-Soit $y \in \R$. Pour $n$ assez grand, on a :
-$$ \P\left( \sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} |(\hat{q}_n^\alpha - q_\alpha)| \leq y \right) \approx \P(|Y| \leq y) $$
-soit
-$$ \P \left( |(\hat{q}_n^\alpha - q_\alpha)| \leq y \sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}} \right) \approx \P(|Y| \leq y). $$
 
-Or, $\P(|Y| \leq y) = 2 \P(Y \leq y) - 1$ par symétrie de $Y$. De plus, $2 \P(Y \leq y) - 1 = 0,995$ revient à $\P(Y \leq y) = 0.9975$, et on peut en déduire $y = q_{0,9975}^{norm}$ à partir de la fonction \texttt{qnorm} de R :
+Soit $y \in \mathbb{R}$. Pour $n$ assez grand, on a :
+$$ \mathbb{P}\left( \sqrt{\frac{nf_S(\hat{q}_\alpha)}{\alpha(1-\alpha)}} |(\hat{q}_n^\alpha - q_\alpha)| \leq y \right) \approx \mathbb{P}(|Y| \leq y) $$
+soit
+$$ \mathbb{P}\left( |(\hat{q}_n^\alpha - q_\alpha)| \leq y \sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}} \right) \approx \mathbb{P}(|Y| \leq y). $$
+
+Or, $\mathbb{P}(|Y| \leq y) = 2 \mathbb{P}(Y \leq y) - 1$ par symétrie
+de $Y$. De plus, $2 \mathbb{P}(Y \leq y) - 1 = 0,995$ revient à
+$\mathbb{P}(Y \leq y) = 0.9975$, et on peut en déduire
+$y = q_{0,9975}^{norm}$ à partir de la fonction \texttt{qnorm} de R :
 
 ```{r}
 q <- qnorm(0.9975, 0, 1)
@@ -216,7 +290,9 @@ q
 
 Finalement, avec probabilité 99,5% :
 $$ q_{0,995} = VaR_{99,5\%} \in \left[ \widehat{VaR}_{99,5\%} - q_{0,9975}^{norm}\sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}}, \widehat{VaR}_{99,5\%} + q_{0,9975}^{norm}\sqrt{\frac{\alpha(1-\alpha)}{nf_S(\hat{q}_\alpha)}} \right] $$
-Où $q_{0.9975}^{norm}$ est le quantile d'ordre $0,9975$ de la loi normale centrée reduite. On peut déduire l'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ :
+Où $q_{0.9975}^{norm}$ est le quantile d'ordre $0,9975$ de la loi
+normale centrée reduite. On peut déduire l'intervalle de confiance à
+$99,5\%$ de $VaR_{99,5\%}$ :
 
 ```{r}
 A = sqrt((0.995*(1-0.995))/f_density_S_norm)
@@ -226,8 +302,8 @@ CI = c(CI_min,CI_max)
 CI
 ```
 
-ainsi qu'un intervalle de confiance de $\SCR(S_1+S_2)$ à 99.5% via la formule
-$$ \SCR(S)=VaR_{99,5\%}(S)-BE(S) $$
+ainsi qu'un intervalle de confiance de $\mathrm{SCR}(S_1+S_2)$ à 99.5%
+via la formule $$ \mathrm{SCR}(S)=VaR_{99,5\%}(S)-BE(S) $$
 
 ```{r}
 IC_norm = CI - BE(S_norm)
@@ -236,7 +312,8 @@ IC_norm
 
 ## Modélisation avec copule de Clayton
 
-On définit la copule de Clayton à partir des paramètres introduits plus haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
+On définit la copule de Clayton à partir des paramètres introduits plus
+haut, et on génère $n = 10^7$ simulations de $(S_1, S_2)$.
 
 ```{r}
 cop_clayton = rotCopula(claytonCopula(alpha_C, dim=2))
@@ -247,14 +324,16 @@ S_i_clayton = rMvdc(n, myMvd_cop_clayton)
 
 ### Formule standard
 
-On répète les étapes effectuées avec une modélisation par copule gaussienne. On calcule d'abord les SCR individuels :
+On répète les étapes effectuées avec une modélisation par copule
+gaussienne. On calcule d'abord les SCR individuels :
 
 ```{r}
 SCR_i_clayton = SCR_mat(S_i_clayton)
 SCR_i_clayton
 ```
 
-On détermine ensuite un intervalle de confiance à 99.5% du coefficient de corrélation de la même manière que précédemment :
+On détermine ensuite un intervalle de confiance à 99.5% du coefficient
+de corrélation de la même manière que précédemment :
 
 ```{r}
 r1 = cor(S_i_clayton)[1,2]
@@ -262,7 +341,8 @@ r2 = r1 + c(-q * (1-r1^2)/sqrt(n), q * (1-r1^2)/sqrt(n))
 r2
 ```
 
-Enfin, on peut en déduire un intervalle de confiance à 99.5% de $\SCR(S_1+S_2)$ :
+Enfin, on peut en déduire un intervalle de confiance à 99.5% de
+$\mathrm{SCR}(S_1+S_2)$ :
 
 ```{r}
 SCR_FS_clayton <- SCR_FS(SCR_i_clayton, r1)
@@ -273,7 +353,10 @@ print(c("Intervalle de confiance", IC_FS_clayton))
 ```
 
 ### Approche exacte
-La démarche à suivre dans cette partie est identique à celle utilisée avec la copule gaussienne. En simulant $S_1$ et $S_2$ grâce à la copule de Clayton, le *Best Estimate* de $S \text{, }BE(S)$ est égal à:
+
+La démarche à suivre dans cette partie est identique à celle utilisée
+avec la copule gaussienne. En simulant $S_1$ et $S_2$ grâce à la copule
+de Clayton, le *Best Estimate* de $S \text{, }BE(S)$ est égal à:
 
 ```{r}
 S_clayton <- S_i_clayton[,1]+S_i_clayton[,2]
@@ -281,26 +364,37 @@ BE(S_clayton)
 ```
 
 La $VaR_{99,5\%}(S)$ est égale à:
+
 ```{r}
 VaR_S_clayton <- quantile(S_clayton, probs = 0.995)[[1]]
 VaR_S_clayton
 ```
-Le $\SCR(S)$ est donc égal à :
+
+Le $\mathrm{SCR}(S)$ est donc égal à :
+
 ```{r}
 SCR_clayton <- SCR(S_clayton)
 SCR_clayton
 ```
-L'estimation de la densité de $S$ est représentée dans le graphique ci-dessous:
+
+L'estimation de la densité de $S$ est représentée dans le graphique
+ci-dessous:
+
 ```{r fig.align="center", fig.cap = "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
 plot(density_S_clayton,xlab = "S", ylab = "Densité", main = "")
 ```
-L'estimation de cette densité au point $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
+
+L'estimation de cette densité au point
+$\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
+
 ```{r}
 f_density_S_clayton = approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
 f_density_S_clayton
 ```
+
 L'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ est :
+
 ```{r}
 A = sqrt((0.995*(1-0.995))/f_density_S_clayton)
 CI_min = VaR_S_clayton - qnorm(0.95)*(A/sqrt(n))
@@ -309,21 +403,38 @@ CI = c(CI_min,CI_max)
 CI
 ```
 
-Et l'intervalle de confiance à $99,5\%$ du $\SCR(S_1+S_2)$ est :
+Et l'intervalle de confiance à $99,5\%$ du $\mathrm{SCR}(S_1+S_2)$ est :
 
 ```{r}
 IC_clayton <- CI - mean(S_clayton)
 IC_clayton
 ```
-## Comparaison des méthodes 
-Afin de comparer les deux méthodes, nous présentons dans la table suivante l'ensemble de nos résultats.
+
+## Comparaison des méthodes
+
+Afin de comparer les deux méthodes, nous présentons dans la table
+suivante l'ensemble de nos résultats.
+
 ```{r, results="asis"}
-df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle exact" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
+df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Approche exacte" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
+```
+Lorsque l'on applique la formule standard pour calculer le $\mathrm{SCR}$, le choix de la copule n'a pas énormémement d'importance. Toutefois, ce dernier devient déterminant dans le cadre de l'approche exacte. En effet, choisir une copule de Clayton pour modéliser la dépendance entre les deux risques conduit à surestimer fortement le $\mathrm{SCR}$, par rapport au calcul effectué en formule standard. A l'inverse, la copule gaussienne diminue légèrement l'estimation du $\mathrm{SCR}$ par rapport au calcul effectué en formule standard.
+
+Nous pouvons également comparer les intervalles de confiance pour chacune des approches et chaque structure de copule utilisée. Dans les tables suivantes, nous appelerons donc min(SCR) et max(SCR) les limites des intervalles de confiance à 99,5%.
+```{r}
+df_comp_norm <- data.frame("Formule standard" = c(IC_FS_norm[1], SCR_FS_norm, IC_FS_norm[2]), "Approche exacte" = c(IC_norm[1], SCR_norm, IC_norm[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
+df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_clayton, IC_FS_clayton[2]), "Approche exacte" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
+
+xtable(df_comp_norm, caption = "Récapitulatif des SCR calculés pour la copule gaussienne")
+xtable(df_comp_clayton, caption = "Récapitulatif des SCR calculés pour la copule de Clayton")
 ```
 
 # Partie 2 - Agrégation des risques par somme aléatoire
-Nous commençons par définir tous les paramètres qui nous seront utiles par la suite.
+
+Nous commençons par définir tous les paramètres qui nous seront utiles
+par la suite.
+
 ```{r}
 n1 <- 8477
 p1 <- 0.3679
@@ -347,14 +458,24 @@ Mvd_cop_clayton = mvdc(copula=cop_clayton, margins=margin_laws_N,
                    paramMargins=margin_params_N)
 ```
 
-Pour simuler $S_1$ et $S_2$ nous procédons en plusieurs étapes. Nous simulons dans un premier temps les deux nombres de sinistres, avec des lois marginales négatives binomiales et la structure de copule choisie (gaussienne ou Clayton). Puis, pour chaque simulation :
+Pour simuler $S_1$ et $S_2$ nous procédons en plusieurs étapes. Nous
+simulons dans un premier temps les deux nombres de sinistres, avec des
+lois marginales négatives binomiales et la structure de copule choisie
+(gaussienne ou Clayton). Puis, pour chaque simulation :
 
-1. Nous générons les $X_n^1$ selon la loi $\mathcal{LN}(\mu_{log}, \sigma_{log})$.
-2. Nous générons les $U_n$ selon la loi $\mathcal{U}([0,1])$. 
-3. Nous calculons $X_n^2 = k + \frac{s}{\xi}(U^{-\xi}-1)$.
-4. Enfin nous sommons respectivement les $X_n^1$ et les $X_n^2$ pour obtenir $S_1$ et $S_2$.
+1.  Nous générons les $X_n^1$ selon la loi
+    $\mathcal{LN}(\mu_{log}, \sigma_{log})$.
+2.  Nous générons les $U_n$ selon la loi $\mathcal{U}([0,1])$.
+3.  Nous calculons $X_n^2 = k + \frac{s}{\xi}(U_n^{-\xi}-1)$.
+4.  Enfin nous sommons respectivement les $X_n^1$ et les $X_n^2$ pour
+    obtenir $S_1$ et $S_2$.
 
-Plusieurs approches ont été tentées afin d'optimiser le temps d'exécution ainsi que l'usage de mémoire vive. Une telle démarche s'avère nécessaire au vu du grand nombre de simulations à générer. Tout d'abord, nous avons testé une fonction R sans boucle utilisant l'instruction \texttt{sapply}. Ensuite, nous avons utilisé un code C (inspiré du cours) contenant une boucle afin d'accélérer l'exécution.
+Plusieurs approches ont été tentées afin d'optimiser le temps
+d'exécution ainsi que l'usage de mémoire vive. Une telle démarche
+s'avère nécessaire au vu du grand nombre de simulations à générer. Tout
+d'abord, nous avons testé une fonction R sans boucle utilisant
+l'instruction \texttt{sapply}. Ensuite, nous avons utilisé un code C
+(inspiré du cours) contenant une boucle afin d'accélérer l'exécution.
 
 ```{r, include = FALSE, echo=FALSE, message=FALSE}
 writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
@@ -407,7 +528,13 @@ simu_somme_aleatoire <- function(n,mvd){
 }
 ```
 
-Nous avons lancé un \emph{microbenchmark} permettant de répéter 100 fois la génération de $n_0 = 10^2$ simulations de $S_1$ à partir de ces deux méthodes. Il ressort que l'usage de C permet effectivement d'accélérer le code, via un gain moyen d'environ 20 millisecondes. Nos expériences ont montré que cet écart s'accroît lorsque le nombre de simulations $n$ fixé est plus important, ce qui tend à renforcer l'intérêt de notre démarche d'optimisation pour $n = 10^5$ simulations.
+Nous avons lancé un \emph{microbenchmark} permettant de répéter 100 fois
+la génération de $n_0 = 10^2$ simulations de $S_1$ à partir de ces deux
+méthodes. Il ressort que l'usage de C permet effectivement d'accélérer
+le code, via un gain moyen d'environ 20 millisecondes. Nos expériences
+ont montré que cet écart s'accroît lorsque le nombre de simulations $n$
+fixé est plus important, ce qui tend à renforcer l'intérêt de notre
+démarche d'optimisation pour $n = 10^5$ simulations.
 
 ```{r}
 
@@ -421,16 +548,20 @@ Nous avons lancé un \emph{microbenchmark} permettant de répéter 100 fois la g
   )
 ```
 
-
 ## Modélisation avec copule gaussienne
-Dans cette partie, nous appliquons une structure de copule gaussienne de paramètre $\rho_C$.
+
+Dans cette partie, nous appliquons une structure de copule gaussienne de
+paramètre $\rho_C$.
+
 ```{r}
 S_i_norm <- simu_somme_aleatoire(n,Mvd_cop_norm)
 ```
 
-
 ### Formule standard
-Pour appliquer la formule standard, nous avons tout d'abord besoin de calculer le coefficient de corrélation linéaire $\rho$ entre $S_1$ et $S_2$. Celui-ci se calcule empiriquement de la manière suivante:
+
+Pour appliquer la formule standard, nous avons tout d'abord besoin de
+calculer le coefficient de corrélation linéaire $\rho$ entre $S_1$ et
+$S_2$. Celui-ci se calcule empiriquement de la manière suivante:
 $$\hat{\rho}_n = \frac{\sum_{i = 1}^n(S_1^i- \overline{S_1})(S_2^i- \overline{S_2})}{\sqrt{\sum_{i = 1}^n(S_1^i- \overline{S_1})^2}\sqrt{\sum_{i = 1}^n(S_2^i- \overline{S_2})^2}}$$
 
 La formule standard donne le SCR suivant:
@@ -441,28 +572,41 @@ SCR_FS_norm
 ```
 
 ### Modèle agrégé
-En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous obtenons:
+
+En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous
+obtenons:
+
 ```{r}
 S_norm <- S_i_norm[,1]+S_i_norm[,2]
 SCR_norm <- SCR(S_norm)
 SCR_norm
 ```
-Nous cherchons également à déterminer un intervalle de confiance pour le SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie 1 pour l'approche exacte.
+
+Nous cherchons également à déterminer un intervalle de confiance pour le
+SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie
+1 pour l'approche exacte.
 
 *Ajout calculs*
 
-Nous devons donc approximer la densité de $S$. Par la méthode des noyaux, nous obtenons la fonction suivante.
+Nous devons donc approximer la densité de $S$. Par la méthode des
+noyaux, nous obtenons la fonction suivante.
+
 ```{r fig.align="center", fig.cap=  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
 plot(density_S_norm, xlab = "S", ylab = "Densité", main = "") 
 ```
-On doit ensuite approximer cette fonction en la valeur du quantile d'ordre 99,5\%.
+
+On doit ensuite approximer cette fonction en la valeur du quantile
+d'ordre 99,5%.
 
 ```{r}
 q_995 <- quantile(density_S_norm, probs = 0.995)
 fS_q_995 <- approx(density_S_norm$x, density_S_norm$y, xout = q_995)$y
 ```
-Puis nous calculons l'intervalle de confiance sur le quantile d'ordre 99,5\%.
+
+Puis nous calculons l'intervalle de confiance sur le quantile d'ordre
+99,5%.
+
 ```{r}
 VaR_S_norm <- quantile(S_norm, probs = 0.995)
 A = sqrt((0.995*(1-0.995))/fS_q_995)
@@ -471,7 +615,10 @@ CI_max = VaR_S_norm + qnorm(0.9975)*(A/sqrt(n))
 CI = c(CI_min,CI_max)
 CI
 ```
-Une fois l'intervalle de confiance calculé pour le quantile d'ordre 99,5\% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le Best estimate pour obtenir un intervalle de confiance du SCR au niveau 99,5\%.
+
+Une fois l'intervalle de confiance calculé pour le quantile d'ordre
+99,5% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le Best
+estimate pour obtenir un intervalle de confiance du SCR au niveau 99,5%.
 
 ```{r}
 IC_norm <- CI-BE(S_norm)
@@ -479,39 +626,54 @@ IC_norm
 ```
 
 ## Modélisation avec copule de Clayton
-Dans cette partie, nous appliquons une structure de copule de Clayton inversée de paramètre $\alpha_C$.
+
+Dans cette partie, nous appliquons une structure de copule de Clayton
+inversée de paramètre $\alpha_C$.
 
 ```{r}
 S_i_clayton <- simu_somme_aleatoire(n, Mvd_cop_clayton)
 ```
 
 ### Formule standard
+
 La formule standard donne le SCR suivant:
+
 ```{r}
 SCR_FS_clayton <- SCR_FS(SCR_i_clayton, cor(S_i_clayton)[1,2])
 SCR_FS_clayton
 ```
 
 ### Modèle agrégé
-En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous obtenons:
+
+En calculant le SCR de manière agrégée, en posant $S = S_1+S_2$, nous
+obtenons:
+
 ```{r}
 S_clayton <- S_i_clayton[,1]+S_i_clayton[,2]
 SCR_clayton <- SCR(S_clayton)
 SCR_clayton
 ```
 
-Nous cherchons également à déterminer un intervalle de confiance pour le SCR. Comme précédemment, nous approximons la densité de $S$ par la méthode des noyaux.
+Nous cherchons également à déterminer un intervalle de confiance pour le
+SCR. Comme précédemment, nous approximons la densité de $S$ par la
+méthode des noyaux.
+
 ```{r fig.align="center", fig.cap=  "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
 plot(density_S_clayton, xlab = "S", ylab = "Densité", main = "")
 ```
-Nous évaluons ensuite cette fonction en la valeur du quantile d'ordre 99,5\%.
+
+Nous évaluons ensuite cette fonction en la valeur du quantile d'ordre
+99,5%.
 
 ```{r}
 q_995 <- quantile(density_S_clayton, probs = 0.995)
 fS_q_995 <- approx( density_S_clayton$x, density_S_clayton$y, xout = q_995)$y
 ```
-Puis nous calculons l'intervalle de confiance sur le quantile d'ordre 99,5\%.
+
+Puis nous calculons l'intervalle de confiance sur le quantile d'ordre
+99,5%.
+
 ```{r}
 VaR_S_clayton <- quantile(S_clayton, probs = 0.995)
 A = sqrt((0.995*(1-0.995))/fS_q_995)
@@ -520,15 +682,22 @@ CI_max = VaR_S_clayton + qnorm(0.9975)*(A/sqrt(n))
 CI = c(CI_min,CI_max)
 CI
 ```
-Une fois l'intervalle de confiance calculé pour le quantile d'ordre 99,5\% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le Best estimate pour obtenir un intervalle de confiance du SCR au niveau 99,5\%.
+
+Une fois l'intervalle de confiance calculé pour le quantile d'ordre
+99,5% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le Best
+estimate pour obtenir un intervalle de confiance du SCR au niveau 99,5%.
 
 ```{r}
 IC_clayton <- CI-BE(S_clayton)
 ```
 
-## Comparaison des méthodes 
-Afin de comparer les deux méthodes, nous présentons dans la table suivante l'ensemble de nos résultats.
+## Comparaison des méthodes
+
+Afin de comparer les deux méthodes, nous présentons dans la table
+suivante l'ensemble de nos résultats.
+
 ```{r, results="asis"}
-df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle exact" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
+df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle agrégé" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
+
