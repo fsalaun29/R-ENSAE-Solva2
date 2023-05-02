@@ -206,7 +206,7 @@ print(c("Intervalle de confiance", IC_FS_norm))
 
 Dans cette partie, nous calculons le $\mathrm{SCR}$ de $S = S_1+S_2$ en
 utilisant une approche directe. Il sera question de simuler $S_1$ et
-$S_2$, de caluler $S$ et ensuite d'appliquer la formule:
+$S_2$, de calculer $S$ et ensuite d'appliquer la formule:
 $$\mathrm{SCR}(S)=VaR_{99,5\%}(S)-BE(S) \text{ où }BE(S) = \mathbb{E}(S) $$
 Le *Best Estimate* (moyenne) de $S \text{, }BE(S)$ est égal à:
 
@@ -261,7 +261,10 @@ graphique ci-dessous:
 
 ```{r fig.align="center", fig.cap =  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
-plot(density_S_norm, xlab = "S", ylab = "Densité", main = "")
+ggplot(data.frame("S" = S_norm), aes(x=S)) + 
+  theme_bw()+
+  xlab("Valeur de S") + ylab("Densité")+
+  geom_density()
 ```
 
 L'estimation de cette densité au point
@@ -306,7 +309,7 @@ ainsi qu'un intervalle de confiance de $\mathrm{SCR}(S_1+S_2)$ à 99.5%
 via la formule $$ \mathrm{SCR}(S)=VaR_{99,5\%}(S)-BE(S) $$
 
 ```{r}
-IC_norm = CI - BE(S_norm)
+IC_norm <- CI - BE(S_norm)
 IC_norm
 ```
 
@@ -390,7 +393,10 @@ $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
 
 ```{r}
 f_density_S_clayton = approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
-f_density_S_clayton
+ggplot(data.frame("S" = S_clayton), aes(x=S)) + 
+  theme_bw()+
+  xlab("Valeur de S") + ylab("Densité")+
+  geom_density()
 ```
 
 L'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ est :
@@ -584,31 +590,33 @@ SCR_norm
 
 Nous cherchons également à déterminer un intervalle de confiance pour le
 SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie
-1 pour l'approche exacte.
+1 pour l'approche exacte. Nous estimons donc la Value at Risk, ou quantile d'ordre $\alpha$=99,5\% via le théorème central limite suivant:
 
-*Ajout calculs*
+$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
 
 Nous devons donc approximer la densité de $S$. Par la méthode des
 noyaux, nous obtenons la fonction suivante.
 
 ```{r fig.align="center", fig.cap=  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
-plot(density_S_norm, xlab = "S", ylab = "Densité", main = "") 
+ggplot(data.frame("S" = S_norm), aes(x=S)) + 
+  theme_bw()+
+  xlab("Valeur de S") + ylab("Densité")+
+  geom_density()
 ```
 
 On doit ensuite approximer cette fonction en la valeur du quantile
 d'ordre 99,5%.
 
 ```{r}
-q_995 <- quantile(density_S_norm, probs = 0.995)
-fS_q_995 <- approx(density_S_norm$x, density_S_norm$y, xout = q_995)$y
+VaR_S_norm <- quantile(S_norm, probs = 0.995)[[1]]
+fS_q_995 <- approx(density_S_norm$x, density_S_norm$y, xout = VaR_S_norm)$y
 ```
 
 Puis nous calculons l'intervalle de confiance sur le quantile d'ordre
 99,5%.
 
 ```{r}
-VaR_S_norm <- quantile(S_norm, probs = 0.995)
 A = sqrt((0.995*(1-0.995))/fS_q_995)
 CI_min = VaR_S_norm - qnorm(0.9975)*(A/sqrt(n))
 CI_max = VaR_S_norm + qnorm(0.9975)*(A/sqrt(n))  
@@ -660,22 +668,24 @@ méthode des noyaux.
 
 ```{r fig.align="center", fig.cap=  "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
-plot(density_S_clayton, xlab = "S", ylab = "Densité", main = "")
+ggplot(data.frame("S" = S_clayton), aes(x=S)) + 
+  theme_bw()+
+  xlab("Valeur de S") + ylab("Densité")+
+  geom_density()
 ```
 
 Nous évaluons ensuite cette fonction en la valeur du quantile d'ordre
 99,5%.
 
 ```{r}
-q_995 <- quantile(density_S_clayton, probs = 0.995)
-fS_q_995 <- approx( density_S_clayton$x, density_S_clayton$y, xout = q_995)$y
+VaR_S_clayton <- quantile(S_clayton, probs = 0.995)[[1]]
+fS_q_995 <- approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
 ```
 
 Puis nous calculons l'intervalle de confiance sur le quantile d'ordre
 99,5%.
 
 ```{r}
-VaR_S_clayton <- quantile(S_clayton, probs = 0.995)
 A = sqrt((0.995*(1-0.995))/fS_q_995)
 CI_min = VaR_S_clayton - qnorm(0.9975)*(A/sqrt(n))
 CI_max = VaR_S_clayton + qnorm(0.9975)*(A/sqrt(n))  
@@ -699,5 +709,10 @@ suivante l'ensemble de nos résultats.
 ```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle agrégé" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
+```
+
+```{r, results="asis"}
+df_comp_agrege <- data.frame("Copule gaussienne" = c(IC_norm[1], SCR_norm, IC_norm[2]), "Copule de Clayton" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
+xtable(df_comp, caption = "Intervalles de confiance obtenus pour le SCR")
 ```
 
