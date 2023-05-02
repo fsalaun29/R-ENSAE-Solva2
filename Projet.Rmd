@@ -3,9 +3,11 @@ title: "Projet de Langage R en Actuariat"
 author: "Marie GANON, Daniel NKAMENI, Florian SALAUN"
 output: 
   pdf_document:
-    fig_width: 4
-    fig_height: 4
+    fig_width: 5
+    fig_height: 3
     number_sections: true
+header-includes:
+  - \usepackage{subfig}
 editor_options: 
   markdown: 
     wrap: 72
@@ -44,8 +46,7 @@ editor_options:
 ```{r setup, include=FALSE}
 # Exécuter cette ligne pour tester le script LaTeX : 
 # knitr::opts_chunk$set(eval = FALSE)
-
-knitr::opts_chunk$set(echo = F, fig.pos= "h")
+knitr::opts_chunk$set(echo = F, fig.pos= "h", warning=FALSE)
 library(knitr)
 library(copula)
 library(matrixStats)
@@ -256,8 +257,7 @@ $$\hat{f}(x)=\frac{1}{nh}\sum_{i=1}^{n}K\left[\frac{x-x_i}{h}\right]$$
 Où $h$ est le pas, $n$ la taille de l'échantillon et $K$ est le noyau
 choisi. Ce noyau est en général gaussien, uniforme ou triangulaire. La
 fonction \texttt{density} de R permet de faire cette estimation sans
-difficulté. L'estimation de la densité de $S$ est représentée dans le
-graphique ci-dessous:
+difficulté. L'estimation de la densité de $S$ est représentée sur la Figure 1.
 
 ```{r fig.align="center", fig.cap =  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
@@ -268,7 +268,7 @@ ggplot(data.frame("S" = S_norm), aes(x=S)) +
 ```
 
 L'estimation de cette densité au point
-$\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est obtenue par interpolation
+$\hat{q}_{0,995} = \widehat{VaR}_{99,5\%}$ est obtenue par interpolation
 grâce à la fonction \texttt{approx} de R et est égale à :
 
 ```{r}
@@ -380,12 +380,14 @@ SCR_clayton <- SCR(S_clayton)
 SCR_clayton
 ```
 
-L'estimation de la densité de $S$ est représentée dans le graphique
-ci-dessous:
+L'estimation de la densité de $S$ est représentée sur la Figure 2.
 
-```{r fig.align="center", fig.cap = "Densité de S - Copule de Clayton"}
+```{r, fig.align="center", fig.cap = "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
-plot(density_S_clayton,xlab = "S", ylab = "Densité", main = "")
+ggplot(data.frame("S" = S_clayton), aes(x=S)) + 
+  theme_bw()+
+  xlab("Valeur de S") + ylab("Densité")+
+  geom_density()
 ```
 
 L'estimation de cette densité au point
@@ -393,10 +395,6 @@ $\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
 
 ```{r}
 f_density_S_clayton = approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
-ggplot(data.frame("S" = S_clayton), aes(x=S)) + 
-  theme_bw()+
-  xlab("Valeur de S") + ylab("Densité")+
-  geom_density()
 ```
 
 L'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ est :
@@ -418,8 +416,8 @@ IC_clayton
 
 ## Comparaison des méthodes
 
-Afin de comparer les deux méthodes, nous présentons dans la table
-suivante l'ensemble de nos résultats.
+Afin de comparer les deux méthodes, nous présentons dans la Table
+1 l'ensemble de nos résultats de SCR.
 
 ```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Approche exacte" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
@@ -428,7 +426,7 @@ xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 Lorsque l'on applique la formule standard pour calculer le $\mathrm{SCR}$, le choix de la copule n'a pas énormémement d'importance. Toutefois, ce dernier devient déterminant dans le cadre de l'approche exacte. En effet, choisir une copule de Clayton pour modéliser la dépendance entre les deux risques conduit à surestimer fortement le $\mathrm{SCR}$, par rapport au calcul effectué en formule standard. A l'inverse, la copule gaussienne diminue légèrement l'estimation du $\mathrm{SCR}$ par rapport au calcul effectué en formule standard.
 
 Nous pouvons également comparer les intervalles de confiance pour chacune des approches et chaque structure de copule utilisée. Dans les tables suivantes, nous appelerons donc min(SCR) et max(SCR) les limites des intervalles de confiance à 99,5%.
-```{r}
+```{r, results="asis"}
 df_comp_norm <- data.frame("Formule standard" = c(IC_FS_norm[1], SCR_FS_norm, IC_FS_norm[2]), "Approche exacte" = c(IC_norm[1], SCR_norm, IC_norm[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
 df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_clayton, IC_FS_clayton[2]), "Approche exacte" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
 
@@ -481,14 +479,16 @@ d'exécution ainsi que l'usage de mémoire vive. Une telle démarche
 s'avère nécessaire au vu du grand nombre de simulations à générer. Tout
 d'abord, nous avons testé une fonction R sans boucle utilisant
 l'instruction \texttt{sapply}. Ensuite, nous avons utilisé un code C
-(inspiré du cours) contenant une boucle afin d'accélérer l'exécution.
+(inspiré du cours) contenant une boucle afin d'accélérer l'exécution. Nous avons lancé un \emph{microbenchmark} permettant de répéter 100 fois
+la génération de $n_0 = 10^2$ simulations de $S_1$ à partir de ces deux
+méthodes. Il en résulte la Figure 3.
 
 ```{r, include = FALSE, echo=FALSE, message=FALSE}
 writeLines('PATH="${RTOOLS40_HOME}\\usr\\bin;${PATH}"', con = "~/.Renviron")
 system("R CMD SHLIB C/rsum.c")
 dyn.load("C/rsum.dll")
-system("R CMD SHLIB C/rsum2.c")
-dyn.load("C/rsum2.dll")
+#system("R CMD SHLIB C/rsum2.c")
+#dyn.load("C/rsum2.dll")
 
 rsum <- function(N1, mu, sigma){
   n = length(N1)
@@ -534,13 +534,6 @@ simu_somme_aleatoire <- function(n,mvd){
 }
 ```
 
-Nous avons lancé un \emph{microbenchmark} permettant de répéter 100 fois
-la génération de $n_0 = 10^2$ simulations de $S_1$ à partir de ces deux
-méthodes. Il ressort que l'usage de C permet effectivement d'accélérer
-le code, via un gain moyen d'environ 20 millisecondes. Nos expériences
-ont montré que cet écart s'accroît lorsque le nombre de simulations $n$
-fixé est plus important, ce qui tend à renforcer l'intérêt de notre
-démarche d'optimisation pour $n = 10^5$ simulations.
 
 ```{r}
 
@@ -548,12 +541,48 @@ démarche d'optimisation pour $n = 10^5$ simulations.
   #nb_S1 <- nb_sinistres[,1]
   #nb_S1 <- simu_somme_aleatoire(10^2, Mvd_cop_norm)[,1]
   
-  microbenchmark(
-    S1 <- sapply(nb_S1, function(x)  sum(rlnorm(x, meanlog = mu_log, sdlog = sigma_log))),
+  mb1 <- microbenchmark(
+    S1 <- sapply(nb_S1, function(x)  sum(rlnorm(x, meanlog = mu_log, sdlog = sigma_log)))
+  )
+  
+  mb2 <- microbenchmark(
     S1 <- rsum(nb_S1, mu_log, sigma_log)
   )
 ```
 
+```{r, echo=FALSE, fig.align = 'center', fig.cap="Résultats des microbenchmarks en (A) avec un apply sur R et en (B) avec du code C", fig.subcap=c('Exécution sur R', 'Exécution sur C'), warning=FALSE, fig.width=6, fig.height=4}
+
+  df_mb1 <- data.frame("time" = mb1$time/1000000)
+  df_mb2 <- data.frame("time" = mb2$time/1000000)
+  min_x <- min(c(mb1$time/1000000, mb2$time/1000000))
+  max_x <- max(c(mb1$time/1000000, mb2$time/1000000))
+  
+  p1 <- ggplot(df_mb1, aes(x=time)) + 
+        theme_bw() + 
+        labs(y="Nombre d'exécutions", x="Temps d'exécution (ms)") +
+        xlim(min_x, max_x) + 
+        geom_histogram(binwidth=20, color="white", fill="lightgrey")+
+        geom_vline(xintercept=median(mb1$time/1000000), color = 'darkred')+
+        geom_label(x=median(mb1$time/1000000), y=2, label="Médiane", label.size = 0.25, colour = 'darkred')
+
+  
+  p2 <- ggplot(df_mb2, aes(x=time)) +
+        theme_bw() + 
+        labs(y="Nombre d'exécutions", x="Temps d'exécution (ms)") +  
+        xlim(min_x, max_x) + 
+        geom_histogram(binwidth=20, color="white", fill="lightgrey")+
+        geom_vline(xintercept=median(mb2$time/1000000), color = 'darkred')+
+        geom_label(x=median(mb2$time/1000000), y=2, label="Médiane", label.size = 0.25, colour = 'darkred')
+
+  
+  plot_grid(p1, p2, labels = c('A', 'B'))
+
+```
+Nous avons constaté, sur une machine équipée d'un processeur Intel Core i7-10510U (4 coeurs, 1.8 GhZ) et d'une mémoire vive de 8 Go, que le code C permettait de réduire le temps d'exécution d'environ un quart par rapport à un code R bien optimisé. En outre, cette solution est optimale en termes d'utilisation de mémoire vive. Par comparaison, la proposition qui consistait à construire sur R une matrice de taille $n \times \max(N)$ n'a pas pu aboutir sur nos machines pour $n = 10^5$, car elle conduisait à libérer plus de 10 Go de mémoire vive.
+
+*Commentaire à ajouter*
+
+\newpage
 ## Modélisation avec copule gaussienne
 
 Dans cette partie, nous appliquons une structure de copule gaussienne de
@@ -595,7 +624,7 @@ SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie
 $$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
 
 Nous devons donc approximer la densité de $S$. Par la méthode des
-noyaux, nous obtenons la fonction suivante.
+noyaux, nous obtenons la fonction tracée sur la Figure 4.
 
 ```{r fig.align="center", fig.cap=  "Densité de S - Copule gaussienne"}
 density_S_norm = density(S_norm, n = 1024)
@@ -664,9 +693,9 @@ SCR_clayton
 
 Nous cherchons également à déterminer un intervalle de confiance pour le
 SCR. Comme précédemment, nous approximons la densité de $S$ par la
-méthode des noyaux.
+méthode des noyaux, puis nous la traçons sur la Figure 5.
 
-```{r fig.align="center", fig.cap=  "Densité de S - Copule de Clayton"}
+```{r, fig.align="center", fig.cap=  "Densité de S - Copule de Clayton"}
 density_S_clayton = density(S_clayton, n = 1024)
 ggplot(data.frame("S" = S_clayton), aes(x=S)) + 
   theme_bw()+
@@ -703,16 +732,22 @@ IC_clayton <- CI-BE(S_clayton)
 
 ## Comparaison des méthodes
 
-Afin de comparer les deux méthodes, nous présentons dans la table
-suivante l'ensemble de nos résultats.
+Afin de comparer les deux méthodes, nous présentons dans la Table
+4 l'ensemble de nos résultats de SCR.
 
 ```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle agrégé" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
 xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
 
+
+*Commentaire à ajouter*
+
+Comparons désormais les intervalles de confiance obtenus via le modèle agrégé. Nous les affichons sur la Table 5 ci-dessous.
+
 ```{r, results="asis"}
 df_comp_agrege <- data.frame("Copule gaussienne" = c(IC_norm[1], SCR_norm, IC_norm[2]), "Copule de Clayton" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
-xtable(df_comp, caption = "Intervalles de confiance obtenus pour le SCR")
+xtable(df_comp_agrege, caption = "Intervalles de confiance obtenus pour le SCR")
 ```
 
+*Commentaire à ajouter*
