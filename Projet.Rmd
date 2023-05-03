@@ -126,23 +126,23 @@ SCR_i_norm
 
 La difficulté consiste dans l'estimation du coefficient de corrélation
 entre $S_1$ et $S_2$. L'énoncé nous rappelle que :
-$$ \sqrt{n} (\hat{r}_n - r) \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}(0,1), \quad \hat{r}_n = \frac{1}{2} \ln \left( \frac{1+\hat{\rho}_n}{1-\hat{\rho}_n} \right) = \mathrm{arctanh}(\hat{\rho}_n), \quad r = \mathrm{arctanh}(\rho). $$
+$$ \sqrt{n} (\widehat{r}_n - r) \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}(0,1), \quad \widehat{r}_n = \frac{1}{2} \ln \left( \frac{1+\widehat{\rho}_n}{1-\widehat{\rho}_n} \right) = \mathrm{arctanh}(\widehat{\rho}_n), \quad r = \mathrm{arctanh}(\rho). $$
 
 Comme la fonction $x \mapsto \tanh(x)$ est dérivable sur $\mathbb{R}$,
 d'après le théorème de la méthode Delta :
 
 ```{=tex}
 \begin{align*}
-  \sqrt{n}(\hat{\rho}_n - \rho) &= \sqrt{n} (\tanh(\hat{r}_n) - \tanh(r)) \\
+  \sqrt{n}(\widehat{\rho}_n - \rho) &= \sqrt{n} (\tanh(\widehat{r}_n) - \tanh(r)) \\
   &\underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} \mathcal{N}(0, (\tanh'(r))^2)
 \end{align*}
 ```
 avec $\tanh'(r) = 1 - \tanh(r)^2 = 1 - \rho^2$. Ainsi :
-$$ \sqrt{n} \frac{\hat{\rho}_n - \rho}{1-\rho^2} \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y $$
+$$ \sqrt{n} \frac{\widehat{\rho}_n - \rho}{1-\rho^2} \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y $$
 avec $Y \sim \mathcal{N}(0,1)$. Dans cette formule, deux termes
 dépendent du coefficient inconnu $\rho$, ce qui ne nous permet pas de
 déduire directement des intervalles de confiance. Or, on sait que
-$\hat{\rho}_n \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \rho$
+$\widehat{\rho}_n \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \rho$
 car
 $$ \widehat{\mathrm{Cov}}(X,Y) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Cov}(X,Y), \quad \widehat{\mathrm{Var}}(X) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Var}(X), \quad \widehat{\mathrm{Var}}(Y) \underset{n \to +\infty}{\overset{p.s.}{\longrightarrow}} \mathrm{Var}(Y) $$
 et car la fonction $(x,y,z) \mapsto \frac{x}{\sqrt{y} \sqrt{z}}$ est
@@ -391,7 +391,7 @@ ggplot(data.frame("S" = S_clayton), aes(x=S)) +
 ```
 
 L'estimation de cette densité au point
-$\hat{q}_{0,995} = \hat{VaR}_{99,5\%}$ est égale à :
+$\hat{q}_{0,995} = \widehat{VaR}_{99,5\%}$ est égale à :
 
 ```{r}
 f_density_S_clayton = approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
@@ -580,7 +580,6 @@ simu_somme_aleatoire <- function(n,mvd){
 ```
 Nous avons constaté, sur une machine équipée d'un processeur Intel Core i7-10510U (4 coeurs, 1.8 GhZ) et d'une mémoire vive de 8 Go, que le code C permettait de réduire le temps d'exécution d'environ un quart par rapport à un code R bien optimisé. En outre, cette solution est optimale en termes d'utilisation de mémoire vive. Par comparaison, la proposition qui consistait à construire sur R une matrice de taille $n \times \max(N)$ n'a pas pu aboutir sur nos machines pour $n = 10^5$, car elle conduisait à libérer plus de 10 Go de mémoire vive.
 
-*Commentaire à ajouter*
 
 \newpage
 ## Modélisation avec copule gaussienne
@@ -597,7 +596,7 @@ S_i_norm <- simu_somme_aleatoire(n,Mvd_cop_norm)
 Pour appliquer la formule standard, nous avons tout d'abord besoin de
 calculer le coefficient de corrélation linéaire $\rho$ entre $S_1$ et
 $S_2$. Celui-ci se calcule empiriquement de la manière suivante:
-$$\hat{\rho}_n = \frac{\sum_{i = 1}^n(S_1^i- \overline{S_1})(S_2^i- \overline{S_2})}{\sqrt{\sum_{i = 1}^n(S_1^i- \overline{S_1})^2}\sqrt{\sum_{i = 1}^n(S_2^i- \overline{S_2})^2}}$$
+$$\widehat{\rho}_n = \frac{\sum_{i = 1}^n(S_1^i- \overline{S_1})(S_2^i- \overline{S_2})}{\sqrt{\sum_{i = 1}^n(S_1^i- \overline{S_1})^2}\sqrt{\sum_{i = 1}^n(S_2^i- \overline{S_2})^2}}$$
 
 La formule standard donne le SCR suivant:
 
@@ -621,7 +620,7 @@ Nous cherchons également à déterminer un intervalle de confiance pour le
 SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie
 1 pour l'approche exacte. Nous estimons donc la Value at Risk, ou quantile d'ordre $\alpha$=99,5\% via le théorème central limite suivant:
 
-$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\hat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
+$$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\widehat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
 
 Nous devons donc approximer la densité de $S$. Par la méthode des
 noyaux, nous obtenons la fonction tracée sur la Figure 4.
