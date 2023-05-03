@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.10) (preloaded format=pdflatex 2022.3.13)  9 APR 2023 22:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.10) (preloaded format=pdflatex 2022.3.13)  3 MAY 2023 23:49
 entering extended mode
 **./Projet.tex
 (Projet.tex
@@ -345,7 +345,72 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layoutvoffset=\dimen160
 \Gm@dimlist=\toks25
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg))
-(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty
+Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+\LTleft=\skip54
+\LTright=\skip55
+\LTpre=\skip56
+\LTpost=\skip57
+\LTchunksize=\count286
+\LTcapwidth=\dimen161
+\LT@head=\box53
+\LT@firsthead=\box54
+\LT@foot=\box55
+\LT@lastfoot=\box56
+\LT@gbox=\box57
+\LT@cols=\count287
+\LT@rows=\count288
+\c@LT@tables=\count289
+\c@LT@chunks=\count290
+\LT@p@ftn=\toks26
+) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen162
+\lightrulewidth=\dimen163
+\cmidrulewidth=\dimen164
+\belowrulesep=\dimen165
+\belowbottomsep=\dimen166
+\aboverulesep=\dimen167
+\abovetopsep=\dimen168
+\cmidrulesep=\dimen169
+\cmidrulekern=\dimen170
+\defaultaddspace=\dimen171
+\@cmidla=\count291
+\@cmidlb=\count292
+\@aboverulesep=\dimen172
+\@belowrulesep=\dimen173
+\@thisruleclass=\count293
+\@lastruleclass=\count294
+\@thisrulewidth=\dimen174
+) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
+Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen175
+\ar@mcellbox=\box58
+\extrarowheight=\dimen176
+\NC@list=\toks27
+\extratabsurround=\skip58
+\backup@length=\skip59
+\ar@cellbox=\box59
+) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/tools\calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count295
+\calc@Bcount=\count296
+\calc@Adimen=\dimen177
+\calc@Bdimen=\dimen178
+\calc@Askip=\skip60
+\calc@Bskip=\skip61
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count297
+\calc@Cskip=\skip62
+)
+(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/footnotehyper\footnoteh
+yper.sty
+Package: footnotehyper 2021/08/13 v1.1e hyperref aware footnote.sty (JFB)
+\FNH@notes=\box60
+\FNH@width=\dimen179
+\FNH@toks=\toks28
+) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
 Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
@@ -358,47 +423,83 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 )
-\Gin@req@height=\dimen161
-\Gin@req@width=\dimen162
+\Gin@req@height=\dimen180
+\Gin@req@width=\dimen181
+) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/subfig\subfig.sty
+Package: subfig 2005/06/28 ver: 1.3 subfig package
+(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption.sty
+Package: caption 2022/02/28 v3.6a Customizing captions (AR)
+(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/caption\caption3.sty
+Package: caption3 2022/02/28 v2.3a caption3 kernel (AR)
+\caption@tempdima=\dimen182
+\captionmargin=\dimen183
+\caption@leftmargin=\dimen184
+\caption@rightmargin=\dimen185
+\caption@width=\dimen186
+\caption@indent=\dimen187
+\caption@parindent=\dimen188
+\caption@hangindent=\dimen189
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count298
+\c@continuedfloat=\count299
+Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+(C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/caption\ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+))
+\c@KVtest=\count300
+\sf@farskip=\skip63
+\sf@captopadj=\dimen190
+\sf@capskip=\skip64
+\sf@nearskip=\skip65
+\c@subfigure=\count301
+\c@subfigure@save=\count302
+\c@lofdepth=\count303
+\c@subtable=\count304
+\c@subtable@save=\count305
+\c@lotdepth=\count306
+\sf@top=\skip66
+\sf@bottom=\skip67
 )
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
 tex.def
 File: l3backend-pdftex.def 2021-10-18 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count286
-\l__pdf_internal_box=\box53
+\l__color_backend_stack_int=\count307
+\l__pdf_internal_box=\box61
 ) (Projet.aux)
 \openout1 = `Projet.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 70.
-LaTeX Font Info:    ... okay on input line 70.
-LaTeX Info: Redefining \microtypecontext on input line 70.
-Package microtype Info: Applying patch `item' on input line 70.
-Package microtype Info: Applying patch `toc' on input line 70.
-Package microtype Info: Applying patch `eqnum' on input line 70.
-Package microtype Info: Applying patch `footnote' on input line 70.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 81.
+LaTeX Font Info:    ... okay on input line 81.
+LaTeX Info: Redefining \microtypecontext on input line 81.
+Package microtype Info: Applying patch `item' on input line 81.
+Package microtype Info: Applying patch `toc' on input line 81.
+Package microtype Info: Applying patch `eqnum' on input line 81.
+Package microtype Info: Applying patch `footnote' on input line 81.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 70.
+LaTeX Info: Redefining \showhyphens on input line 81.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -409,17 +510,17 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
 ii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count287
-\scratchdimen=\dimen163
-\scratchbox=\box54
-\nofMPsegments=\count288
-\nofMParguments=\count289
-\everyMPshowfont=\toks26
-\MPscratchCnt=\count290
-\MPscratchDim=\dimen164
-\MPnumerator=\count291
-\makeMPintoPDFobject=\count292
-\everyMPtoPDFconversion=\toks27
+\scratchcounter=\count308
+\scratchdimen=\dimen191
+\scratchbox=\box62
+\nofMPsegments=\count309
+\nofMParguments=\count310
+\everyMPshowfont=\toks29
+\MPscratchCnt=\count311
+\MPscratchDim=\dimen192
+\MPnumerator=\count312
+\makeMPintoPDFobject=\count313
+\everyMPtoPDFconversion=\toks30
 )
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
 ase.sty
@@ -431,7 +532,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 70.
+Package hyperref Info: Link coloring OFF on input line 81.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
@@ -441,11 +542,11 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 lestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count293
+\c@section@level=\count314
 )
-LaTeX Info: Redefining \ref on input line 70.
-LaTeX Info: Redefining \pageref on input line 70.
-LaTeX Info: Redefining \nameref on input line 70.
+LaTeX Info: Redefining \ref on input line 81.
+LaTeX Info: Redefining \pageref on input line 81.
+LaTeX Info: Redefining \nameref on input line 81.
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -480,40 +581,43 @@ LaTeX Info: Redefining \nameref on input line 70.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
-2.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: subfig package v1.3 is loaded.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 8
+3.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
-2.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 8
+3.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-72.
+83.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-72.
+83.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 72.
+(Font)              <12> on input line 83.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 72.
+(Font)              <8> on input line 83.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 72.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 72.
+(Font)              <6> on input line 83.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 83.
 
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 72.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 83.
 
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -521,101 +625,97 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 110.
+(Font)              <10> on input line 121.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 110.
+(Font)              <7> on input line 121.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 110.
+(Font)              <5> on input line 121.
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-29.
+40.
 (C:\Users\flori\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ) [1
 
 {C:/Users/flori/AppData/Local/MiKTeX/pdftex/config/pdftex.map}] [2]
-<Projet_files/figure-latex/unnamed-chunk-11-1.pdf, id=36, 289.08pt x 289.08pt>
-File: Projet_files/figure-latex/unnamed-chunk-11-1.pdf Graphic file (type pdf)
-<use Projet_files/figure-latex/unnamed-chunk-11-1.pdf>
-Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-11-1.pdf  used
- on input line 267.
-(pdftex.def)             Requested size: 289.09251pt x 289.09251pt.
+<Projet_files/figure-latex/unnamed-chunk-12-1.pdf, id=36, 361.35pt x 216.81pt>
+File: Projet_files/figure-latex/unnamed-chunk-12-1.pdf Graphic file (type pdf)
+<use Projet_files/figure-latex/unnamed-chunk-12-1.pdf>
+Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-12-1.pdf  used
+ on input line 261.
+(pdftex.def)             Requested size: 361.34912pt x 216.80946pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[3] [4 <./Projet_files/figure-latex/unnamed-chunk-11-1.pdf>]
-<Projet_files/figure-latex/unnamed-chunk-23-1.pdf, id=56, 289.08pt x 289.08pt>
-File: Projet_files/figure-latex/unnamed-chunk-23-1.pdf Graphic file (type pdf)
-<use Projet_files/figure-latex/unnamed-chunk-23-1.pdf>
-Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-23-1.pdf  used
- on input line 378.
-(pdftex.def)             Requested size: 289.09251pt x 289.09251pt.
-[5 <./Projet_files/figure-latex/unnamed-chunk-23-1.pdf>]
-Overfull \hbox (18.49356pt too wide) in paragraph at lines 476--476
-[]\T1/lmtt/m/n/10 ##                                                           
-                            expr[] 
- []
-
-
-Overfull \hbox (18.49356pt too wide) in paragraph at lines 476--476
-[]\T1/lmtt/m/n/10 ##  S1 <- sapply(nb_S1, function(x) sum(rlnorm(x, meanlog = m
-u_log,      sdlog = sigma_log)))[] 
- []
-
-
-Overfull \hbox (18.49356pt too wide) in paragraph at lines 476--476
-[]\T1/lmtt/m/n/10 ##                                                       S1 <
-- rsum(nb_S1, mu_log, sigma_log)[] 
- []
-
-[6]
-<Projet_files/figure-latex/unnamed-chunk-34-1.pdf, id=86, 289.08pt x 289.08pt>
+[3] [4 <./Projet_files/figure-latex/unnamed-chunk-12-1.pdf>]
+<Projet_files/figure-latex/unnamed-chunk-25-1.pdf, id=57, 361.35pt x 216.81pt>
+File: Projet_files/figure-latex/unnamed-chunk-25-1.pdf Graphic file (type pdf)
+<use Projet_files/figure-latex/unnamed-chunk-25-1.pdf>
+Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-25-1.pdf  used
+ on input line 348.
+(pdftex.def)             Requested size: 361.34912pt x 216.80946pt.
+[5 <./Projet_files/figure-latex/unnamed-chunk-25-1.pdf>]
+<Projet_files/figure-latex/unnamed-chunk-34-1.pdf, id=72, 433.62pt x 289.08pt>
 File: Projet_files/figure-latex/unnamed-chunk-34-1.pdf Graphic file (type pdf)
 <use Projet_files/figure-latex/unnamed-chunk-34-1.pdf>
 Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-34-1.pdf  used
- on input line 520.
-(pdftex.def)             Requested size: 289.09251pt x 289.09251pt.
-[7 <./Projet_files/figure-latex/unnamed-chunk-34-1.pdf>]
-<Projet_files/figure-latex/unnamed-chunk-41-1.pdf, id=101, 289.08pt x 289.08pt>
+ on input line 470.
+(pdftex.def)             Requested size: 433.63878pt x 289.09251pt.
 
-File: Projet_files/figure-latex/unnamed-chunk-41-1.pdf Graphic file (type pdf)
-<use Projet_files/figure-latex/unnamed-chunk-41-1.pdf>
-Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-41-1.pdf  used
- on input line 580.
-(pdftex.def)             Requested size: 289.09251pt x 289.09251pt.
-[8 <./Projet_files/figure-latex/unnamed-chunk-41-1.pdf>] [9] (Projet.aux) ) 
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[6] [7 <./Projet_files/figure-latex/unnamed-chunk-34-1.pdf>]
+<Projet_files/figure-latex/unnamed-chunk-38-1.pdf, id=103, 361.35pt x 216.81pt>
+
+File: Projet_files/figure-latex/unnamed-chunk-38-1.pdf Graphic file (type pdf)
+<use Projet_files/figure-latex/unnamed-chunk-38-1.pdf>
+Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-38-1.pdf  used
+ on input line 529.
+(pdftex.def)             Requested size: 361.34912pt x 216.80946pt.
+<Projet_files/figure-latex/unnamed-chunk-45-1.pdf, id=104, 361.35pt x 216.81pt>
+
+File: Projet_files/figure-latex/unnamed-chunk-45-1.pdf Graphic file (type pdf)
+<use Projet_files/figure-latex/unnamed-chunk-45-1.pdf>
+Package pdftex.def Info: Projet_files/figure-latex/unnamed-chunk-45-1.pdf  used
+ on input line 579.
+(pdftex.def)             Requested size: 361.34912pt x 216.80946pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[8 <./Projet_files/figure-latex/unnamed-chunk-38-1.pdf>] [9 <./Projet_files/fig
+ure-latex/unnamed-chunk-45-1.pdf>] (Projet.aux) ) 
 Here is how much of TeX's memory you used:
- 13379 strings out of 478681
- 215013 string characters out of 2846535
- 556339 words of memory out of 3000000
- 31117 multiletter control sequences out of 15000+600000
- 463544 words of font info for 118 fonts, out of 8000000 for 9000
+ 15352 strings out of 478681
+ 253101 string characters out of 2846535
+ 590584 words of memory out of 3000000
+ 33044 multiletter control sequences out of 15000+600000
+ 464089 words of font info for 124 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,18n,77p,1005b,483s stack positions out of 5000i,500n,10000p,200000b,80000s
-{C:/
-Users/flori/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/
-Users/flori/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/User
-s/flori/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}{C:/User
-s/flori/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/User
-s/flori/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}<C:/Users/fl
-ori/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/fl
-ori/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/fl
-ori/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/fl
-ori/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/fl
-ori/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi5.pfb><C:/Users/flo
-ri/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/flor
-i/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/flori
-/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/flori/
-AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/flori/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr5.pfb><C:/Users/flori/App
-Data/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/flori/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/flori/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/flori/AppDa
-ta/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb><C:/Users/flori/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/Users/flori/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on Projet.pdf (9 pages, 360276 bytes).
+ 74i,18n,79p,1005b,392s stack positions out of 5000i,500n,10000p,200000b,80000s
+{C:/Users/flori/AppData/Local/
+Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Users/flori/AppData/Local/
+Programs/MiKTeX/fonts/enc/dvips/lm/lm-rm.enc}{C:/Users/flori/AppData/Local/Prog
+rams/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}{C:/Users/flori/AppData/Local/Prog
+rams/MiKTeX/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Users/flori/AppData/Local/Prog
+rams/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}<C:/Users/flori/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmbx10.pfb><C:/Users/flori/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmbx12.pfb><C:/Users/flori/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmex10.pfb><C:/Users/flori/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmmi10.pfb><C:/Users/flori/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/lm/lmmi5.pfb><C:/Users/flori/AppData/Local/Programs/
+MiKTeX/fonts/type1/public/lm/lmmi7.pfb><C:/Users/flori/AppData/Local/Programs/M
+iKTeX/fonts/type1/public/lm/lmr10.pfb><C:/Users/flori/AppData/Local/Programs/Mi
+KTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/flori/AppData/Local/Programs/MiK
+TeX/fonts/type1/public/lm/lmr17.pfb><C:/Users/flori/AppData/Local/Programs/MiKT
+eX/fonts/type1/public/lm/lmr5.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX
+/fonts/type1/public/lm/lmr7.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/lm/lmri10.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/lm/lmsy10.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/lm/lmsy7.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/lm/lmtt10.pfb><C:/Users/flori/AppData/Local/Programs/MiKTeX/fo
+nts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on Projet.pdf (9 pages, 357468 bytes).
 PDF statistics:
- 259 PDF objects out of 1000 (max. 8388607)
- 52 named destinations out of 1000 (max. 500000)
- 32917 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 271 PDF objects out of 1000 (max. 8388607)
+ 56 named destinations out of 1000 (max. 500000)
+ 32922 words of extra memory for PDF output out of 35830 (max. 10000000)
 
