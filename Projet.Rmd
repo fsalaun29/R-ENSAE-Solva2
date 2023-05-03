@@ -427,8 +427,8 @@ Lorsque l'on applique la formule standard pour calculer le $\mathrm{SCR}$, le ch
 
 Nous pouvons également comparer les intervalles de confiance pour chacune des approches et chaque structure de copule utilisée. Dans les tables suivantes, nous appelerons donc min(SCR) et max(SCR) les limites des intervalles de confiance à 99,5%.
 ```{r, results="asis"}
-df_comp_norm <- data.frame("Formule standard" = c(IC_FS_norm[1], SCR_FS_norm, IC_FS_norm[2]), "Approche exacte" = c(IC_norm[1], SCR_norm, IC_norm[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
-df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_clayton, IC_FS_clayton[2]), "Approche exacte" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
+df_comp_norm <- data.frame("Formule standard" = c(IC_FS_norm[1], SCR_FS_norm, IC_FS_norm[2]), "Approche exacte" = c(IC_norm[1], SCR_norm, IC_norm[2]), row.names = c("min(SCR)", "SCR", "max(SCR)"))
+df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_clayton, IC_FS_clayton[2]), "Approche exacte" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR)"))
 
 xtable(df_comp_norm, caption = "Récapitulatif des SCR calculés pour la copule gaussienne")
 xtable(df_comp_clayton, caption = "Récapitulatif des SCR calculés pour la copule de Clayton")
@@ -745,7 +745,7 @@ xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 Comparons désormais les intervalles de confiance obtenus via le modèle agrégé. Nous les affichons sur la Table 5 ci-dessous.
 
 ```{r, results="asis"}
-df_comp_agrege <- data.frame("Copule gaussienne" = c(IC_norm[1], SCR_norm, IC_norm[2]), "Copule de Clayton" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR"))
+df_comp_agrege <- data.frame("Copule gaussienne" = c(IC_norm[1], SCR_norm, IC_norm[2]), "Copule de Clayton" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR)"))
 xtable(df_comp_agrege, caption = "Intervalles de confiance obtenus pour le SCR")
 ```
 
