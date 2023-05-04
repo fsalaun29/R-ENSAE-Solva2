@@ -430,11 +430,7 @@ Afin de comparer les deux méthodes, nous présentons dans la Table
 
 ```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Approche exacte" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
-#xtable(df_comp, caption = "Récapitulatif des SCR calculés")
-```
-
-```{r table1}
-  knitr::kable(df_comp, caption = "Récapitulatif des SCR calculés")
+xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
 
 Lorsque l'on applique la formule standard pour calculer le $\mathrm{SCR}$, le choix de la copule n'a pas énormémement d'importance. Toutefois, ce dernier devient déterminant dans le cadre de l'approche exacte. En effet, choisir une copule de Clayton pour modéliser la dépendance entre les deux risques conduit à surestimer fortement le $\mathrm{SCR}$, par rapport au calcul effectué en formule standard. A l'inverse, la copule gaussienne diminue légèrement l'estimation du $\mathrm{SCR}$ par rapport au calcul effectué en formule standard.
@@ -444,9 +440,10 @@ Nous pouvons également comparer les intervalles de confiance pour chacune des a
 df_comp_norm <- data.frame("Formule standard" = c(IC_FS_norm[1], SCR_FS_norm, IC_FS_norm[2]), "Approche exacte" = c(IC_norm[1], SCR_norm, IC_norm[2]), row.names = c("min(SCR)", "SCR", "max(SCR)"))
 df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_clayton, IC_FS_clayton[2]), "Approche exacte" = c(IC_clayton[1], SCR_clayton, IC_clayton[2]), row.names = c("min(SCR)", "SCR", "max(SCR)"))
 
-xtable(df_comp_norm, caption = "Récapitulatif des SCR calculés pour la copule gaussienne")
-xtable(df_comp_clayton, caption = "Récapitulatif des SCR calculés pour la copule de Clayton")
+xtable(df_comp_norm, caption = "Récapitulatif des SCR calculés pour la copule gaussienne", align = c('c', 'c', 'c'))
+xtable(df_comp_clayton, caption = "Récapitulatif des SCR calculés pour la copule de Clayton", align = c('c', 'c', 'c'))
 ```
+Quelle que soit la copule utilisée, nous notons que les intervalles de confiance obtenus en modèle agrégé sont bien plus resserrés autour du $SCR$ moyen que dans le cas de la formule standard. Cependant, si nous nous intéressons uniquement au calcul du $SCR$ avec la formule standard, son écart-type est légèrement plus faible lorsque l'on choisit une copule gaussienne.
 
 # Partie 2 - Agrégation des risques par somme aléatoire
 
@@ -584,7 +581,7 @@ simu_somme_aleatoire <- function(n,mvd){
         theme_bw() + 
         labs(y="Nombre d'exécutions", x="Temps d'exécution (ms)") +  
         xlim(min_x, max_x) + 
-        geom_histogram(binwidth=20, color="white", fill="lightgrey")+
+        geom_histogram(binwidth=10, color="white", fill="lightgrey")+
         geom_vline(xintercept=median(mb2$time/1000000), color = 'darkred')+
         geom_label(x=median(mb2$time/1000000), y=2, label="Médiane", label.size = 0.25, colour = 'darkred')
 
@@ -594,8 +591,8 @@ simu_somme_aleatoire <- function(n,mvd){
 ```
 Nous avons constaté, sur une machine équipée d'un processeur Intel Core i7-10510U (4 coeurs, 1.8 GhZ) et d'une mémoire vive de 8 Go, que le code C permettait de réduire le temps d'exécution d'environ un quart par rapport à un code R bien optimisé. En outre, cette solution est optimale en termes d'utilisation de mémoire vive. Par comparaison, la proposition qui consistait à construire sur R une matrice de taille $n \times \max(N)$ n'a pas pu aboutir sur nos machines pour $n = 10^5$, car elle conduisait à libérer plus de 10 Go de mémoire vive.
 
-
 \newpage
+
 ## Modélisation avec copule gaussienne
 
 Dans cette partie, nous appliquons une structure de copule gaussienne de
@@ -753,7 +750,7 @@ Afin de comparer les deux méthodes, nous présentons dans la Table
 
 ```{r, results="asis"}
 df_comp <- data.frame("Formule standard" = c(SCR_FS_norm, SCR_FS_clayton), "Modèle agrégé" = c(SCR_norm, SCR_clayton), row.names = c("Copule gaussienne", "Copule de Clayton"))
-xtable(df_comp, caption = "Récapitulatif des SCR calculés")
+xtable(df_comp, caption = "Récapitulatif des SCR calculés", align = c('c', 'c', 'c'))
 ```
 
 
