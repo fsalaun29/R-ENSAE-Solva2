@@ -757,7 +757,7 @@ xtable(df_comp, caption = "Récapitulatif des SCR calculés")
 ```
 
 
-*Commentaire à ajouter*
+Lorsque la dépendance entre les nombres de sinistres est modélisée par une copule de Clayton, le SCR calculé avec la formule standard et est très éloigné de celui calculé avec le modèle agrégé. Nous remarquons également que le SCR obtenu grâce à la formule standard dans le cas où la copule gaussienne est utilisée est très proche des SCR calculés avec le modèle agrégé peu importe la copule utilisée. Une explication possible à cet écart est que dans notre cas, le coefficient de corrélation linéaire de Pearson utilisé dans la formule standard capte mal le lien induit entre $S_1$ et $S_2$ par la copule de Clayton. La vérification de cette hypothèse nécessite une analyse approfondie de la structure de la copule de Clayton. Une telle analyse va au-delà du cadre de ce projet.
 
 Comparons désormais les intervalles de confiance obtenus via le modèle agrégé. Nous les affichons sur la Table 5 ci-dessous.
 
@@ -766,4 +766,4 @@ df_comp_agrege <- data.frame("Copule gaussienne" = c(IC_norm[1], SCR_norm, IC_no
 xtable(df_comp_agrege, caption = "Intervalles de confiance obtenus pour le SCR")
 ```
 
-*Commentaire à ajouter*
+Les deux intervalles de confiance sont très resserrés autour des SCR estimés. En effet, la largeur de l’intervalle de confiance est de $723.63$ dans le cas où une copule gaussienne est utilisée et de $685.34$ dans le cas où une copule de Clayton est utilisée. Ces largeurs sont très faibles par rapport aux SCR estimés. Ceci démontre la précision des estimations faites dans les deux cas. Par ailleurs, les valeurs du SCR calculés avec la formule standard et le modèle agrégé sont assez proches dans le cas où la copule gaussienne est utilisée (cf. Table 4). Ceci démontre la robustesse des estimations obtenues en modélisant la dépendance par une copule gaussienne. Pour avoir un mélange de précision et de robustesse des estimations du SCR pour des portefeuilles similaires au nôtre, nous recommandons de modéliser la dépendance entre les nombres de sinistres par une copule gaussienne.
