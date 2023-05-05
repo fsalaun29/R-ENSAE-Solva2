@@ -402,6 +402,7 @@ $\hat{q}_{0,995} = \widehat{VaR}_{99,5\%}$ est égale à :
 
 ```{r}
 f_density_S_clayton = approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
+cat(f_density_S_clayton)
 ```
 
 L'intervalle de confiance à $99,5\%$ de $VaR_{99,5\%}$ est :
@@ -443,7 +444,7 @@ df_comp_clayton <- data.frame("Formule standard" = c(IC_FS_clayton[1], SCR_FS_cl
 xtable(df_comp_norm, caption = "Récapitulatif des SCR calculés pour la copule gaussienne", align = c('c', 'c', 'c'))
 xtable(df_comp_clayton, caption = "Récapitulatif des SCR calculés pour la copule de Clayton", align = c('c', 'c', 'c'))
 ```
-Quelle que soit la copule utilisée, nous notons que les intervalles de confiance obtenus en modèle agrégé sont bien plus resserrés autour du $SCR$ moyen que dans le cas de la formule standard. Cependant, si nous nous intéressons uniquement au calcul du $SCR$ avec la formule standard, son écart-type est légèrement plus faible lorsque l'on choisit une copule gaussienne.
+Quelle que soit la copule utilisée, nous notons que les intervalles de confiance obtenus en modèle agrégé sont bien plus resserrés autour du $\mathrm{SCR}$ moyen que dans le cas de la formule standard. Cependant, si nous nous intéressons uniquement au calcul du $\mathrm{SCR}$ avec la formule standard, son écart-type est légèrement plus faible lorsque l'on choisit une copule gaussienne.
 
 # Partie 2 - Agrégation des risques par somme aléatoire
 
@@ -567,12 +568,12 @@ simu_somme_aleatoire <- function(n,mvd){
   df_mb2 <- data.frame("time" = mb2$time/1000000)
   min_x <- min(c(mb1$time/1000000, mb2$time/1000000))
   max_x <- max(c(mb1$time/1000000, mb2$time/1000000))
-  
+
   p1 <- ggplot(df_mb1, aes(x=time)) + 
         theme_bw() + 
         labs(y="Nombre d'exécutions", x="Temps d'exécution (ms)") +
         xlim(min_x, max_x) + 
-        geom_histogram(binwidth=20, color="white", fill="lightgrey")+
+        geom_histogram(binwidth= 10, color="white", fill="lightgrey")+
         geom_vline(xintercept=median(mb1$time/1000000), color = 'darkred')+
         geom_label(x=median(mb1$time/1000000), y=2, label="Médiane", label.size = 0.25, colour = 'darkred')
 
@@ -629,7 +630,7 @@ cat(round(SCR_norm))
 
 Nous cherchons également à déterminer un intervalle de confiance pour le
 SCR. Pour ce faire, nous reprenons les calculs effectués dans la partie
-1 pour l'approche exacte. Nous estimons donc la Value at Risk, ou quantile d'ordre $\alpha$=99,5\% via le théorème central limite suivant:
+1 pour l'approche exacte. Nous estimons donc la *Value at Risk*, ou quantile d'ordre $\alpha$=99,5\% via le théorème central limite suivant:
 
 $$\sqrt{\frac{nf_S(q_\alpha)}{\alpha(1-\alpha)}} (\widehat{q}_n^\alpha - q_\alpha)  \underset{n \to +\infty}{\overset{(d)}{\longrightarrow}} Y \text{ où } Y\sim\mathcal{N}(0,1)$$
 
@@ -716,11 +717,12 @@ ggplot(data.frame("S" = S_clayton), aes(x=S)) +
 ```
 
 Nous évaluons ensuite cette fonction en la valeur du quantile d'ordre
-99,5%.
+99,5%:
 
 ```{r}
 VaR_S_clayton <- quantile(S_clayton, probs = 0.995)[[1]]
 fS_q_995 <- approx(density_S_clayton$x, density_S_clayton$y, xout = VaR_S_clayton)$y
+cat(VaR_S_clayton)
 ```
 
 Puis nous calculons l'intervalle de confiance sur le quantile d'ordre
@@ -736,8 +738,7 @@ cat(paste0("[", round(CI[1]), ", ", round(CI[2]), "]"))
 ```
 
 Une fois l'intervalle de confiance calculé pour le quantile d'ordre
-99,5% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le Best
-estimate pour obtenir un intervalle de confiance du SCR au niveau 99,5%.
+99,5% de $S$, soit $VaR_{99,5\%}$, nous pouvons alors retrancher le *Best Estimate* pour obtenir un intervalle de confiance du SCR au niveau 99,5%.
 
 ```{r}
 IC_clayton <- CI-BE(S_clayton)
